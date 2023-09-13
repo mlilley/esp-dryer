@@ -35,10 +35,10 @@ bool SelectProfilePage::handleInput(int button) {
         case BUTTON_OK:
             m_accepted = true;
             m_acceptedValue = &m_selected;
-            return false;
+            return true;
         case BUTTON_BACK:
             m_cancelled = true;
-            return false;
+            return true;
     }
     return false;
 }

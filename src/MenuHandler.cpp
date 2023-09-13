@@ -28,8 +28,13 @@ MenuPage* handleInput(int msg, MenuPage* menuPage) {
     menuPage->handleInput(msg);
     if (menuPage->isAccepted()) {
         if (menuPage == _homePage) {
-            _selectProfilePage->activate(true);
-            return _selectProfilePage;
+            if (*((int*)(_homePage->getAcceptedValue())) == 0) {
+                _selectProfilePage->activate(true);
+                return _selectProfilePage;
+            }
+            // TODO
+            _homePage->activate(false);
+            return menuPage;
         }
         if (menuPage == _selectProfilePage) {
             profile_t profile = _profiles[*((int*)(_selectProfilePage->getAcceptedValue()))];
@@ -45,11 +50,6 @@ MenuPage* handleInput(int msg, MenuPage* menuPage) {
         return menuPage;
     }
     if (menuPage->isCancelled()) {
-        if (menuPage == _homePage) {
-            // TODO
-            menuPage->activate(true);
-            return menuPage;
-        }
         if (menuPage == _selectProfilePage) {
             _homePage->activate(false);
             return _homePage;

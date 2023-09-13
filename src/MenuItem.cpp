@@ -14,7 +14,7 @@ void MenuItem::setSelected(bool selected) {
 }
 
 void MenuItem::render(Adafruit_SSD1306* display, int x, int y, int w) {
-    display->setCursor(0, y);
+    display->setCursor(x, y);
     display->setTextColor(SSD1306_WHITE);
     display->printf((m_selected ? ">%s" : " %s"), (m_title == NULL ? "" : m_title));
 }

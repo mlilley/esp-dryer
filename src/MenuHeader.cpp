@@ -9,9 +9,9 @@ void MenuHeader::setTitle(const char* title) {
 }
 
 void MenuHeader::render(Adafruit_SSD1306* display) {
-    display->setCursor(0,0);
+    display->setCursor(2,1);
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
     display->print(m_title);
-    display->drawFastHLine(0, H-1, SCREEN_W, SSD1306_WHITE);
+    display->fillRect(0, 0, SCREEN_W, 10, SSD1306_INVERSE);
 }
