@@ -36,6 +36,7 @@ build_flags = -D SSD1306_NO_SPLASH
 
 # uC Pinout
 
+```
                                                          +------------+
                        VCC <---------------- VIN 3.3V 19 |            | 38 GND -------------------------->
                      (xxx) <---------------- RESET EN 18 | +--------+ | 37 GPIO23 -----------------------> Button 3
@@ -58,3 +59,4 @@ build_flags = -D SSD1306_NO_SPLASH
                                                VIN 5V  1 | o +----+ o | 20 GPIO6 FLASH SCK --------------> (xxX flash)
                                                          +---|    |---+ 
                                                              +----+
+```
