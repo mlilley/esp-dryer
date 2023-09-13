@@ -58,30 +58,3 @@ build_flags = -D SSD1306_NO_SPLASH
                                                VIN 5V  1 | o +----+ o | 20 GPIO6 FLASH SCK --------------> (xxX flash)
                                                          +---|    |---+ 
                                                              +----+
-
-GPIO1 and GPIO3 are used for serial comms, using this for gpio will interfere.
-
-# Wireup
-
-                       +------------+
-           VIN 3.3V 19 |            | 38 
-                       | +--------+ | 37 GPIO23 
-                       | |        | | 36 GPIO22 -> Screen SCL
-                       | |        | | 35 (x)
-                       | |        | | 34 (x)
-                       | +--------+ | 33 GPIO21 -> Screen SDA
-                       |            | 32 GND
-                       |            | 31 GPIO19 VSPI MISO
-                       |            | 30 GPIO18 VSPI SCK
-                       |            | 29 GPIO5  VSPI SS
-                       |    TOP     | 28 GPIO17
-                       |            | 27 GPIO16
-                       |            | 26 GPIO4 ADC10 TOUCH0
-                GND  6 |            | 25 GPIO0 ADC11 TOUCH1
-                       |            | 24 GPIO2 ADC12 TOUCH2
-                       |            | 23 GPIO15 ADC13 TOUCH3
-                       |            | 22 GPIO8 FLASH D1
-                       |            | 21 GPIO7 FLASH D0
-                       | o +----+ o | 20 GPIO6 FLASH SCK
-                       +---|    |---+ 
-                           +----+
