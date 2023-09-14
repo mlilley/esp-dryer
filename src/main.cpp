@@ -33,7 +33,7 @@ void setup() {
 
     Serial.print("OK");
 
-    xQueueHandle queueInput = xQueueCreate(100, sizeof(int));
+    xQueueHandle queueInput = xQueueCreate(100, sizeof(input_t));
 
     setupMenuHandler(&display, profiles, 7, queueInput);
     setupInputHandler(GPIO_BUTTONUP, GPIO_BUTTONDOWN, GPIO_BUTTONOK, GPIO_BUTTONBACK, queueInput);

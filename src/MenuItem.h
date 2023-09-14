@@ -15,7 +15,7 @@ class MenuItem {
         void setTitle(const char* title);
         void setSelected(bool selected);
         virtual void render(Adafruit_SSD1306* display, int x, int y, int w);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif

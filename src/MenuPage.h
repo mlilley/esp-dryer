@@ -16,7 +16,7 @@ class MenuPage {
         virtual void activate(bool reset);
         void* getAcceptedValue();
         virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif

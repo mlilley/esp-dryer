@@ -11,7 +11,7 @@ class MenuEditableItem : public MenuItem {
     public:
         MenuEditableItem(const char* title);
         virtual void render(Adafruit_SSD1306* display, int x, int y, int w);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif

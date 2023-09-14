@@ -31,6 +31,6 @@ void MenuPage::render(Adafruit_SSD1306* display) {
     display->clearDisplay();
 }
 
-bool MenuPage::handleInput(int button) {
+bool MenuPage::handleInput(input_t input) {
     return false;
 }

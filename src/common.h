@@ -17,9 +17,9 @@
 #define MENUITEMS_MAX 10
 
 #define TEMP_MIN 0
-#define TEMP_MAX 99
+#define TEMP_MAX 80
 #define HOURS_MIN 0
-#define HOURS_MAX 99
+#define HOURS_MAX 24
 #define MINS_MIN 0
 #define MINS_MAX 59
 
@@ -46,5 +46,10 @@ typedef struct profile_t {
     int mins;
     int temp;
 } profile_t;
+
+typedef struct input_t {
+    int button;
+    bool longpress;
+} input_t;
 
 #endif

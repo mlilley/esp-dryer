@@ -1,7 +1,5 @@
 #include "InputHandler.h"
 
-#include <Arduino.h>
-
 #define NUM_BUTTONS 4
 #define BTN_NUM_REQUIRED_CONSISTENT_READINGS 5
 #define BTN_QUIESCENCE 10
@@ -47,12 +45,14 @@ void setupInputHandler(int gpio1, int gpio2, int gpio3, int gpio4, xQueueHandle 
 /**
  * Handler debounces button activity by looking for multiple consecutive 
  * consistent readings, prior to recording the button as changing state.
- * Button presses are placed in the Input queue, for consumption by other tasks.
- * Holding a button down results in repeat button presses.
+ * Button presses are placed in a queue, for consumption by other tasks.
+ * Holding a button down results in repeat button presses, and applying the 
+ * long-press modifer;
  */
 void taskInputHandler(void *param) {
     const TickType_t delay = 2/portTICK_PERIOD_MS;
     bool reading;
+    input_t input;
     for (;;) {
         for (int x = 0; x < NUM_BUTTONS; x++) {
             if (!buttons[x].changing) {
@@ -70,8 +70,9 @@ void taskInputHandler(void *param) {
                     if (ms - buttons[x].lastRead > BTN_REPEAT) {
                         // Button has remained pushed for the repeat period; enqueue another pushed msg.
                         buttons[x].lastRead = ms;
-                        int msg = x;
-                        xQueueSend(queueInput, &msg, 500);
+                        input.button = x;
+                        input.longpress = true;
+                        xQueueSend(queueInput, &input, 500);
                     }
                 }
             } else {
@@ -90,8 +91,9 @@ void taskInputHandler(void *param) {
                             buttons[x].numConsistentReadings = 0;
                             // If button changed to pushed, enqueue a pushed msg.
                             if (buttons[x].state) {
-                                int msg = x;
-                                xQueueSend(queueInput, &msg, 500);
+                                input.button = x;
+                                input.longpress = false;
+                                xQueueSend(queueInput, &input, 500);
                             }              
                         }
                     } else {

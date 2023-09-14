@@ -11,12 +11,13 @@ class MenuEditableIntItem : public MenuEditableItem {
         int m_prevValue;
         int m_min;
         int m_max;
+        int m_chars;
     public:
-        MenuEditableIntItem(const char* title, int value, int min, int max);
+        MenuEditableIntItem(const char* title, int value, int min, int max, int chars);
         int getValue();
         void setValue(int value);
         virtual void render(Adafruit_SSD1306* display, int x, int y, int w);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif

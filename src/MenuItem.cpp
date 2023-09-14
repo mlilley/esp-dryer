@@ -19,6 +19,6 @@ void MenuItem::render(Adafruit_SSD1306* display, int x, int y, int w) {
     display->printf((m_selected ? ">%s" : " %s"), (m_title == NULL ? "" : m_title));
 }
 
-bool MenuItem::handleInput(int button) {
+bool MenuItem::handleInput(input_t input) {
     return false;
 }

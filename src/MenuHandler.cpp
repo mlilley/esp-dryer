@@ -24,8 +24,8 @@ void setupMenuHandler(Adafruit_SSD1306* display, profile_t profiles[], int nProf
     _confirmProfilePage = new ConfirmProfilePage();
 }
 
-MenuPage* handleInput(int msg, MenuPage* menuPage) {
-    menuPage->handleInput(msg);
+MenuPage* handleInput(input_t input, MenuPage* menuPage) {
+    menuPage->handleInput(input);
     if (menuPage->isAccepted()) {
         if (menuPage == _homePage) {
             if (*((int*)(_homePage->getAcceptedValue())) == 0) {
@@ -63,7 +63,7 @@ MenuPage* handleInput(int msg, MenuPage* menuPage) {
 }
 
 void taskMenuHandler(void* params) {
-    int msg;
+    input_t input;
     MenuPage* menuPage = _homePage;
 
     menuPage->activate(true);
@@ -71,8 +71,8 @@ void taskMenuHandler(void* params) {
     _display->display();
 
     for (;;) {
-        if (xQueueReceive(_queueInput, &msg, 500)) {
-            menuPage = handleInput(msg, menuPage);
+        if (xQueueReceive(_queueInput, &input, 500)) {
+            menuPage = handleInput(input, menuPage);
             menuPage->render(_display);
             _display->display();
         }

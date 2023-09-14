@@ -3,13 +3,17 @@
 #include "MenuEditableIntItem.h"
 
 ConfirmProfilePage::ConfirmProfilePage() {
-    MenuItem* items[3];
-    items[0] = new MenuEditableIntItem("Temp:", 0, TEMP_MIN, TEMP_MAX);
-    items[1] = new MenuEditableIntItem("Hours:", 0, HOURS_MIN, HOURS_MAX);
-    items[2] = new MenuEditableIntItem("Minutes:", 0, MINS_MIN, MINS_MAX);
+    MenuItem* items[6];
+    items[0] = new MenuItem("START");
+    items[1] = new MenuEditableIntItem("Temp", 0, TEMP_MIN, TEMP_MAX, 2);
+    items[2] = new MenuEditableIntItem("Hours", 0, HOURS_MIN, HOURS_MAX, 2);
+    items[3] = new MenuEditableIntItem("Minutes", 0, MINS_MIN, MINS_MAX, 2);
+    items[4] = new MenuItem("Save");
+    items[5] = new MenuItem("Reset");
 
     m_header = new MenuHeader("Confirm Profile:");
-    m_list = new MenuList(0, 14, SCREEN_W, 3, items, 3);
+    // 11 chars + 1 => 72px => (128-72)/2 => 28px
+    m_list = new MenuList(28, 14, 72, 5, items, 6);
 }
 
 void ConfirmProfilePage::setProfile(profile_t* profile) {
@@ -31,11 +35,11 @@ void ConfirmProfilePage::render(Adafruit_SSD1306* display) {
     m_list->render(display);
 }
 
-bool ConfirmProfilePage::handleInput(int button) {
-    if (m_list->handleInput(button)) {
+bool ConfirmProfilePage::handleInput(input_t input) {
+    if (m_list->handleInput(input)) {
         return true;
     }
-    switch (button) {
+    switch (input.button) {
         case BUTTON_OK:
             m_accepted = true;
             return false;

@@ -16,7 +16,7 @@ class SelectProfilePage : public MenuPage {
         SelectProfilePage(profile_t profiles[], int nProfiles);
         void activate(bool reset);
         virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif

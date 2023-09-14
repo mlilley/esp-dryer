@@ -34,6 +34,8 @@ The lib offers SSD1306_NO_SPLASH to avoid this, but just #define'ing it prior to
 build_flags = -D SSD1306_NO_SPLASH
 ```
 
+Font size 1 is 6px wide, giving 21 chars across + 2px.
+
 # uC Pinout
 
 ```

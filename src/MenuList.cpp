@@ -53,13 +53,13 @@ void MenuList::render(Adafruit_SSD1306* display) {
     }
 }
 
-bool MenuList::handleInput(int button) {
+bool MenuList::handleInput(input_t input) {
     // If something is selected, ask it to handle the button
-    if (m_selected != -1 && m_items[m_selected]->handleInput(button)) {
+    if (m_selected != -1 && m_items[m_selected]->handleInput(input)) {
         return true;
     }
     // If nothing selected, or selected didn't handle it, we'll handle it
-    switch (button) {
+    switch (input.button) {
         case BUTTON_UP:
             selectPrev();
             return true;

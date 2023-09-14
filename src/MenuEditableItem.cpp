@@ -8,9 +8,9 @@ void MenuEditableItem::render(Adafruit_SSD1306* display, int x, int y, int w) {
     MenuItem::render(display, x, y, w);
 }
 
-bool MenuEditableItem::handleInput(int button) {
+bool MenuEditableItem::handleInput(input_t input) {
     if (m_editing) {
-        switch (button) {
+        switch (input.button) {
             case BUTTON_UP:
                 return true;
             case BUTTON_DOWN:
@@ -23,7 +23,7 @@ bool MenuEditableItem::handleInput(int button) {
                 return true;
         }
     } else {
-        switch (button) {
+        switch (input.button) {
             case BUTTON_UP:
                 return false;
             case BUTTON_DOWN:

@@ -37,12 +37,12 @@ void HomePage::render(Adafruit_SSD1306* display) {
     m_list->render(display);
 }
 
-bool HomePage::handleInput(int button) {
-    if (m_list->handleInput(button)) {
+bool HomePage::handleInput(input_t input) {
+    if (m_list->handleInput(input)) {
         m_selected = m_list->getSelected();
         return true;
     }
-    switch (button) {
+    switch (input.button) {
         case BUTTON_OK:
             m_accepted = true;
             m_acceptedValue = &m_selected;

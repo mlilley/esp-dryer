@@ -18,7 +18,7 @@ class ConfirmProfilePage : public MenuPage {
         void setProfile(profile_t* profile);
         void activate(bool reset);
         virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(int button);
+        virtual bool handleInput(input_t input);
 };
 
 #endif
