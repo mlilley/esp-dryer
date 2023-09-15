@@ -7,7 +7,7 @@ HomePage::HomePage() : MenuPage() {
     MenuItem* items[2];
     items[0] = new MenuItem("START");
     items[1] = new MenuItem("SETTINGS");
-    m_list = new MenuList(32, 26, 56, 2, items, 2);
+    m_list = new MenuList(30, 26, 56, 2, items, 2, false);
 }
 
 void HomePage::activate(bool reset) {

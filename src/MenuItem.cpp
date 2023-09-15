@@ -14,9 +14,13 @@ void MenuItem::setSelected(bool selected) {
 }
 
 void MenuItem::render(Adafruit_SSD1306* display, int x, int y, int w) {
-    display->setCursor(x, y);
     display->setTextColor(SSD1306_WHITE);
-    display->printf((m_selected ? ">%s" : " %s"), (m_title == NULL ? "" : m_title));
+    if (m_selected) {
+        display->setCursor(x, y);
+        display->print("\x10");
+    }
+    display->setCursor(x+8, y);
+    display->printf("%s",(m_title == NULL ? "" : m_title));
 }
 
 bool MenuItem::handleInput(input_t input) {

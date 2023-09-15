@@ -5,14 +5,18 @@
 #include "MenuPage.h"
 #include "MenuHeader.h"
 #include "MenuList.h"
+#include "MenuDialog.h"
 #include <Adafruit_SSD1306.h>
 
 class ConfirmProfilePage : public MenuPage {
     protected:
         MenuHeader* m_header;
         MenuList* m_list;
+        MenuDialog* m_saveDialog;
+        MenuDialog* m_resetDialog;
         profile_t* m_profile;
-        
+        bool m_showSaveDialog;
+        bool m_showResetDialog;
     public:
         ConfirmProfilePage();
         void setProfile(profile_t* profile);

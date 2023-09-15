@@ -1,13 +1,14 @@
 #include "SelectProfilePage.h"
 
 SelectProfilePage::SelectProfilePage(profile_t profiles[], int nProfiles) {
+    m_header = new MenuHeader("Select Profile:");
+
     MenuItem* items[nProfiles];
     for (int i = 0; i < nProfiles; i++) {
-        items[i] = new MenuItem(profiles[i].label);
+        items[i] = new MenuItem(profiles[i].name);
     }
+    m_list = new MenuList(34, 14, 60, 5, items, nProfiles, true); // (128-60)/2 = 34
 
-    m_header = new MenuHeader("Select Profile:");
-    m_list = new MenuList(0, 14, SCREEN_W, 5, items, nProfiles);
     m_list->selectItem(0);
     m_selected = 0;
 }

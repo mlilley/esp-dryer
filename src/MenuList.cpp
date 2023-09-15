@@ -1,6 +1,6 @@
 #include "MenuList.h"
 
-MenuList::MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems) {
+MenuList::MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems, bool indicator) {
     m_x = x;
     m_y = y;
     m_w = w;
@@ -12,6 +12,7 @@ MenuList::MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems
     m_nItems = nItems;
     m_selected = -1;
     m_viewFirst = 0;
+    m_indicator = indicator;
 }
 
 void MenuList::selectItem(int item) {
@@ -48,7 +49,7 @@ void MenuList::render(Adafruit_SSD1306* display) {
     int nItem = 0;
     for (int i = i0; i <= iN; i++) {
         MenuItem* menuItem = m_items[nItem];
-        m_items[i]->render(display, m_x, m_y + nItem * MenuItem::H, m_w);
+        m_items[i]->render(display, m_x, m_y + nItem * MenuItem::H, m_w - 3);
         nItem++;
     }
 }

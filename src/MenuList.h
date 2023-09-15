@@ -6,6 +6,10 @@
 
 class MenuList {
     protected:
+        static const int ADJUSTVIEW_MODE_TOPOF = 0;
+        static const int ADJUSTVIEW_MODE_BOTTOMOF = 1;
+
+    protected:
         int m_x;
         int m_y;
         int m_w;
@@ -15,9 +19,10 @@ class MenuList {
         int m_nItems;
         int m_selected;
         int m_viewFirst;
+        int m_indicator;
 
     public:
-        MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems);
+        MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems, bool indicator);
         void selectItem(int item);
         int getSelected();
         MenuItem* getItem(int item);

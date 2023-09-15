@@ -12,13 +12,13 @@
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 profile_t profiles[] = {
-    { .name = "PLA",   .label = "PLA ..... 6h @ 45""\xF8""C", .hours = 6,  .mins = 0, .temp = 45 },
-    { .name = "PETG",  .label = "PETG .... 6h @ 60""\xF8""C", .hours = 6,  .mins = 0, .temp = 60 },
-    { .name = "ABS",   .label = "ABS ..... 6h @ 70""\xF8""C", .hours = 6,  .mins = 0, .temp = 70 },
-    { .name = "ASA",   .label = "ASA ..... 6h @ 80""\xF8""C", .hours = 6,  .mins = 0, .temp = 80 },
-    { .name = "TPU",   .label = "TPU ..... 4h @ 45""\xF8""C", .hours = 4,  .mins = 0, .temp = 45 },
-    { .name = "Nylon", .label = "Nylon ... 6h @ 80""\xF8""C", .hours = 6,  .mins = 0, .temp = 80 },
-    { .name = "PolyC", .label = "PolyC .. 10h @ 80""\xF8""C", .hours = 10, .mins = 0, .temp = 80 } 
+    { .name = "PLA",   .label = "PLA ..... 6h @ 45""\xF8""C", .temp = 45, .hours = 60 },
+    { .name = "PETG",  .label = "PETG .... 6h @ 60""\xF8""C", .temp = 60, .hours = 60 },
+    { .name = "ABS",   .label = "ABS ..... 6h @ 70""\xF8""C", .temp = 70, .hours = 60 },
+    { .name = "ASA",   .label = "ASA ..... 6h @ 80""\xF8""C", .temp = 80, .hours = 60 },
+    { .name = "TPU",   .label = "TPU ..... 4h @ 45""\xF8""C", .temp = 45, .hours = 40 },
+    { .name = "NYLON", .label = "NYLON ... 6h @ 80""\xF8""C", .temp = 80, .hours = 60 },
+    { .name = "POLYC", .label = "POLYC .. 10h @ 80""\xF8""C", .temp = 80, .hours = 100 } 
 };
 
 void setup() {
