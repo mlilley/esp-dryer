@@ -72,7 +72,6 @@ bool MenuDialog::handleInput(input_t input) {
     switch (input.button) {
         case BUTTON_UP:
         case BUTTON_DOWN:
-            Serial.print("Dlg::UpDn\n");
             if (m_kind == KIND_OK) {
                 m_selected = 0;
             } else if (m_kind == KIND_OKCANCEL) {
@@ -80,7 +79,6 @@ bool MenuDialog::handleInput(input_t input) {
             }
             break;
         case BUTTON_OK:
-            Serial.print("Dlg::Ok\n");
             if (m_kind == KIND_OK) {
                 m_state = 1;
             } else if (m_kind == KIND_OKCANCEL) {
@@ -88,7 +86,6 @@ bool MenuDialog::handleInput(input_t input) {
             }
             break;
         case BUTTON_BACK:
-            Serial.print("Dlg::Cancel\n");
             if (m_kind == KIND_OK) {
                 m_state = 1;
             } else if (m_kind == KIND_OKCANCEL) {

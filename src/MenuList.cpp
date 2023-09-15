@@ -43,6 +43,7 @@ MenuItem* MenuList::getItem(int item) {
 }
 
 void MenuList::render(Adafruit_SSD1306* display) {
+    
     int n = (m_nItems > m_lines ? m_lines : m_nItems);
     int i0 = m_viewFirst;
     int iN = i0 + n - 1;
@@ -51,6 +52,14 @@ void MenuList::render(Adafruit_SSD1306* display) {
         MenuItem* menuItem = m_items[nItem];
         m_items[i]->render(display, m_x, m_y + nItem * MenuItem::H, m_w - 3);
         nItem++;
+    }
+
+    if (m_indicator) {
+        float delta = 1.0 / m_nItems;
+        int y0 = (((float)(m_h * m_selected)) * delta) + m_y;
+        int y1 = (((float)(m_h * (m_selected + 1))) * delta) + m_y;
+        display->drawFastVLine(m_x + m_w - 1, m_y, m_h, SSD1306_WHITE);
+        display->drawFastVLine(m_x + m_w - 2, y0, y1-y0, SSD1306_WHITE);
     }
 }
 
