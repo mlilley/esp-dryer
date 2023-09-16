@@ -20,8 +20,8 @@ ConfirmProfilePage::ConfirmProfilePage() {
     items[0] = new MenuItem("START");
     items[1] = new MenuEditableIntItem("Temp", 0, TEMP_MIN, TEMP_MAX, 4, "%2d""\xF8""C", NULL, NULL);
     items[2] = new MenuEditableIntItem("Hours", 0, HOURS_MIN, HOURS_MAX, 4, NULL, &hoursTransformer, &hoursMutator);
-    items[3] = new MenuItem("Save");
-    items[4] = new MenuItem("Reset");
+    items[3] = new MenuItem("Save profile");
+    items[4] = new MenuItem("Reset profile");
     m_list = new MenuList(0, 14, SCREEN_W, 5, items, 5, true);
 
     m_saveDialog = new MenuDialog(MenuDialog::KIND_OKCANCEL, "Save profile", "settings?");

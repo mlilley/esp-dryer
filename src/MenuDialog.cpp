@@ -56,14 +56,14 @@ void MenuDialog::render(Adafruit_SSD1306* display) {
             display->fillRect(46, Y + 37, 15, 10, SSD1306_INVERSE);
         }
     } else if (m_kind == KIND_OKCANCEL) {
-        display->setCursor(20, Y + 38);
+        display->setCursor(X + 12, Y + 38);
         display->print("OK");
-        display->setCursor(80, Y + 38);
+        display->setCursor(X + W - 1 - 12 - 36, Y + 38);
         display->print("CANCEL");
         if (m_selected == 0) {
-            display->fillRect(18, Y + 37, 15, 10, SSD1306_INVERSE);
+            display->fillRect(X + 12 - 2, Y + 38 - 1, 2 * 6 + 4 - 1, 10, SSD1306_INVERSE);
         } else if (m_selected == 1) {
-            display->fillRect(78, Y + 37, 39, 10, SSD1306_INVERSE);
+            display->fillRect(X + W - 1 - 12 - 36 - 2, Y + 38 - 1, 36 + 4 - 1, 10, SSD1306_INVERSE);
         }        
     }
 }
