@@ -11,9 +11,12 @@ class MenuEditableIntItem : public MenuEditableItem {
         int m_prevValue;
         int m_min;
         int m_max;
-        int m_chars;
+        int m_wchars;
+        const char* m_fmt;
+        intTransformer_t m_transformer;
+        intMutator_t m_mutator;
     public:
-        MenuEditableIntItem(const char* title, int value, int min, int max, int chars);
+        MenuEditableIntItem(const char* title, int value, int min, int max, int wchars, const char* fmt, intTransformer_t transformer, intMutator_t mutator);
         int getValue();
         void setValue(int value);
         virtual void render(Adafruit_SSD1306* display, int x, int y, int w);

@@ -2,13 +2,24 @@
 
 #include "MenuEditableIntItem.h"
 
+char* hoursTransformer(int value, int wchars) {
+    double val = ((double)value)/10.0;
+    char* str = (char*)malloc(sizeof(char)*(wchars+1));
+    sprintf(str, "%4.1f", val);
+    return str;
+}
+
+int hoursMutator(int value, bool up, bool longpress) {
+    return value + (up ? 5 : -5) * (longpress ? 10 : 1);
+}
+
 ConfirmProfilePage::ConfirmProfilePage() {
     m_header = new MenuHeader("Confirm Profile:");
 
     MenuItem* items[5];
     items[0] = new MenuItem("START");
-    items[1] = new MenuEditableIntItem("Temp", 0, TEMP_MIN, TEMP_MAX, 2);
-    items[2] = new MenuEditableIntItem("Hours", 0, HOURS_MIN, HOURS_MAX, 2);
+    items[1] = new MenuEditableIntItem("Temp", 0, TEMP_MIN, TEMP_MAX, 4, "%2d""\xF8""C", NULL, NULL);
+    items[2] = new MenuEditableIntItem("Hours", 0, HOURS_MIN, HOURS_MAX, 4, NULL, &hoursTransformer, &hoursMutator);
     items[3] = new MenuItem("Save");
     items[4] = new MenuItem("Reset");
     m_list = new MenuList(0, 14, SCREEN_W, 5, items, 5, true);

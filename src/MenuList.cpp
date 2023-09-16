@@ -43,7 +43,6 @@ MenuItem* MenuList::getItem(int item) {
 }
 
 void MenuList::render(Adafruit_SSD1306* display) {
-    
     int n = (m_nItems > m_lines ? m_lines : m_nItems);
     int i0 = m_viewFirst;
     int iN = i0 + n - 1;
@@ -134,7 +133,7 @@ void MenuList::adjustView(int mode) {
             m_viewFirst = m_selected - m_lines + 1;
         }
         // Shift view box back within list bounds.
-        if (m_viewFirst + m_nItems - 1 > m_nItems) {
+        if (m_viewFirst + m_lines - 1 > m_nItems) {
             m_viewFirst = m_nItems - m_lines;
         }
         if (m_viewFirst <= 0) {

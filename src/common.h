@@ -18,10 +18,8 @@
 
 #define TEMP_MIN 0
 #define TEMP_MAX 80
-#define HOURS_MIN 0
-#define HOURS_MAX 240
-#define MINS_MIN 0
-#define MINS_MAX 59
+#define HOURS_MIN 0 // Fixed point; x10
+#define HOURS_MAX 240 // Fixed point; x10
 
 #define BUTTON_UP 0
 #define BUTTON_DOWN 1
@@ -30,7 +28,6 @@
 
 typedef struct profile_t {
     const char *name;
-    const char *label;
     int temp;    
     int hours; // (fixed point; x10)
 } profile_t;
@@ -39,5 +36,9 @@ typedef struct input_t {
     int button;
     bool longpress;
 } input_t;
+
+typedef char* (*intTransformer_t)(int, int);
+
+typedef int (*intMutator_t)(int value, bool up, bool longpress);
 
 #endif
