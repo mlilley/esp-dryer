@@ -147,26 +147,20 @@ void MenuList::selectNext() {
 }
 
 void MenuList::adjustView() {
-    Serial.print("adjustView\n");
     if (m_selected == -1 || m_nItems == 0) {
-        Serial.print("A\n");
         m_viewFirst = 0;
         return;
     }
     if (m_selected >= m_viewFirst && m_selected < m_viewFirst + m_nLines) {
-        Serial.print("B\n");
         return;
     }
     if (m_selected < m_viewFirst) {
-        Serial.print("C\n");
         m_viewFirst = m_selected;
     }
     if (m_selected >= m_viewFirst + m_nLines) {
-        Serial.print("D\n");
         m_viewFirst = m_selected - m_nLines + 1;
     }
     if (m_viewFirst < 0) {
-        Serial.print("E\n");
         m_viewFirst = 0;
     }
 }
