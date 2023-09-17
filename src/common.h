@@ -26,12 +26,6 @@
 #define BUTTON_OK 2
 #define BUTTON_BACK 3
 
-typedef struct profile_t {
-    const char *name;
-    int temp;    
-    int hours; // (fixed point; x10)
-} profile_t;
-
 typedef struct input_t {
     int button;
     bool longpress;

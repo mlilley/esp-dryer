@@ -11,6 +11,7 @@ class MenuItem {
         const char* m_title;
         bool m_selected;
     public:
+        MenuItem();
         MenuItem(const char* title);
         void setTitle(const char* title);
         void setSelected(bool selected);

@@ -4,62 +4,84 @@
 #include "HomePage.h"
 #include "SelectProfilePage.h"
 #include "ConfirmProfilePage.h"
-#include <Adafruit_SSD1306.h>
 
-static Adafruit_SSD1306* _display;
+static ConfigStore* _config;
 static xQueueHandle _queueInput;
-static profile_t* _profiles;
+static Adafruit_SSD1306* _display;
 
 static HomePage* _homePage;
 static SelectProfilePage* _selectProfilePage;
 static ConfirmProfilePage* _confirmProfilePage;
 
-void setupMenuHandler(Adafruit_SSD1306* display, profile_t profiles[], int nProfiles, xQueueHandle queueInput) {
-    _display = display;
+void setupMenuHandler(ConfigStore* config, xQueueHandle queueInput, Adafruit_SSD1306* display) {
+    _config = config;
     _queueInput = queueInput;
-    _profiles = profiles;
+    _display = display;
 
     _homePage = new HomePage();
-    _selectProfilePage = new SelectProfilePage(profiles, nProfiles);
-    _confirmProfilePage = new ConfirmProfilePage();
+    _selectProfilePage = new SelectProfilePage(_config);
+    _confirmProfilePage = new ConfirmProfilePage(_config);
 }
 
-MenuPage* handleInput(input_t input, MenuPage* menuPage) {
-    menuPage->handleInput(input);
-    if (menuPage->isAccepted()) {
-        if (menuPage == _homePage) {
-            if (*((int*)(_homePage->getAcceptedValue())) == 0) {
-                _selectProfilePage->activate(true);
-                return _selectProfilePage;
-            }
-            // TODO
+typedef struct transition_t {
+    MenuPage* toPage;
+    bool reset;
+} transition_t;
+
+transition_t afterInput_HomePage() {
+    if (_homePage->isAccepted()) {
+        if (*((int*)(_homePage->getAcceptedValue())) == 0) {
+            // Start selected
+            return (transition_t){ _selectProfilePage, true };
+        } else if (*((int*)(_homePage->getAcceptedValue())) == 1) {
+            // Settings selected (TODO)
+            // return (transition_t){ _settingsPage, true };
             _homePage->activate(false);
-            return menuPage;
-        }
-        if (menuPage == _selectProfilePage) {
-            profile_t profile = _profiles[*((int*)(_selectProfilePage->getAcceptedValue()))];
-            _confirmProfilePage->setProfile(&profile);
-            _confirmProfilePage->activate(true);
-            return _confirmProfilePage;
-        }
-        if (menuPage == _confirmProfilePage) {
-            // TODO
-            _confirmProfilePage->activate(true);
-            return _confirmProfilePage;
-        }
-        return menuPage;
-    }
-    if (menuPage->isCancelled()) {
-        if (menuPage == _selectProfilePage) {
-            _homePage->activate(false);
-            return _homePage;
-        }
-        if (menuPage == _confirmProfilePage) {
-            _selectProfilePage->activate(false);
-            return _selectProfilePage;
         }
     }
-    return menuPage;
+    return (transition_t){};
+}
+
+transition_t afterInput_SelectProfilePage() {
+    if (_selectProfilePage->isAccepted()) {
+        _confirmProfilePage->setProfile(*(int*)(_selectProfilePage->getAcceptedValue()));
+        return (transition_t){ _confirmProfilePage, true };
+    } else if (_selectProfilePage->isCancelled()) {
+        return (transition_t){ _homePage, false };
+    }
+    return (transition_t){};
+}
+
+transition_t afterInput_ConfirmProfilePage() {
+    if (_confirmProfilePage->isAccepted()) {
+        // Profile confirmed (TODO)
+        // return (transition_t){ _runPage, true };
+        _confirmProfilePage->activate(false);
+    } else if (_confirmProfilePage->isCancelled()) {
+        return (transition_t){ _selectProfilePage, false };
+    }
+    return (transition_t){};
+}
+
+MenuPage* handleInput(input_t input, MenuPage* currentPage) {
+    transition_t transition;
+
+    currentPage->handleInput(input);
+
+    if (currentPage == _homePage) {
+        transition = afterInput_HomePage();
+    } else if (currentPage == _selectProfilePage) {
+        transition = afterInput_SelectProfilePage();
+    } else if (currentPage == _confirmProfilePage) {
+        transition = afterInput_ConfirmProfilePage();
+    }
+
+    if (transition.toPage != NULL) {
+        transition.toPage->activate(transition.reset);
+        currentPage = transition.toPage;
+    }
+
+    return currentPage;
 }
 
 void taskMenuHandler(void* params) {

@@ -1,34 +1,59 @@
 #include "MenuList.h"
 
-MenuList::MenuList(int x, int y, int w, int lines, MenuItem* items[], int nItems, bool indicator) {
+MenuList::MenuList() {
+}
+
+MenuList::MenuList(int x, int y, int w, int nLines, MenuItem* items[], int nItems, bool scrollbarEnabled) {
     m_x = x;
     m_y = y;
     m_w = w;
-    m_h = lines * MenuItem::H;
-    m_lines = lines;
+    m_h = nLines * MenuItem::H;
+    m_nLines = nLines;
     for (int i = 0; i < nItems; i++) {
         m_items[i] = items[i];
     }
     m_nItems = nItems;
     m_selected = -1;
     m_viewFirst = 0;
-    m_indicator = indicator;
+    m_scrollbarEnabled = scrollbarEnabled;
 }
 
-void MenuList::selectItem(int item) {
-    if (m_selected == item) {
-        return;
+void MenuList::setLayout(int x, int y, int w, int nLines) {
+    m_x = x;
+    m_y = y;
+    m_w = w;
+    m_h = nLines * MenuItem::H;
+    m_nLines = nLines;
+}
+
+void MenuList::setScrollbarEnabled(bool enabled) {
+    m_scrollbarEnabled = enabled;
+}
+
+void MenuList::setItems(MenuItem* items[], int nItems) {
+    int n = (nItems > ITEMS_MAX ? ITEMS_MAX : nItems);
+    for (int i = 0; i < n; i++) {
+        m_items[i] = items[i];
     }
-    if (m_selected != -1) {
+    m_nItems = n;
+    m_selected = -1;
+    adjustView();
+}
+
+void MenuList::setSelected(int item) {
+    if (m_selected >= 0 && m_selected < m_nItems) {
         m_items[m_selected]->setSelected(false);
     }
+
+    int prevSelected = m_selected;
     if (item < 0 || item >= m_nItems) {
         m_selected = -1;
-        return;
+        adjustView();
+    } else {
+        m_selected = item;
+        m_items[m_selected]->setSelected(true);
+        adjustView();
     }
-    m_selected = item;
-    m_items[m_selected]->setSelected(true);
-    adjustView(ADJUSTVIEW_MODE_TOPOF);
 }
 
 int MenuList::getSelected() {
@@ -43,7 +68,7 @@ MenuItem* MenuList::getItem(int item) {
 }
 
 void MenuList::render(Adafruit_SSD1306* display) {
-    int n = (m_nItems > m_lines ? m_lines : m_nItems);
+    int n = (m_nItems > m_nLines ? m_nLines : m_nItems);
     int i0 = m_viewFirst;
     int iN = i0 + n - 1;
     int nItem = 0;
@@ -53,7 +78,7 @@ void MenuList::render(Adafruit_SSD1306* display) {
         nItem++;
     }
 
-    if (m_indicator) {
+    if (m_scrollbarEnabled) {
         float delta = 1.0 / m_nItems;
         int y0 = (((float)(m_h * m_selected)) * delta) + m_y;
         int y1 = (((float)(m_h * (m_selected + 1))) * delta) + m_y;
@@ -80,64 +105,68 @@ bool MenuList::handleInput(input_t input) {
 }
 
 void MenuList::selectPrev() {
-    if (m_nItems == 0) return;
+    if (m_nItems == 0) {
+        m_selected = -1;
+        adjustView();
+        return;
+    }
     if (m_selected == -1) {
         m_selected = 0;
         m_items[m_selected]->setSelected(true);
-        adjustView(ADJUSTVIEW_MODE_TOPOF);
+        adjustView();
         return;
     }
     m_items[m_selected]->setSelected(false);
-    m_selected = (m_selected <= 0 ? m_nItems - 1 : m_selected - 1);
+    m_selected -= 1;
+    if (m_selected < 0) {
+        m_selected = m_nItems - 1;
+    }
     m_items[m_selected]->setSelected(true);
-    adjustView(ADJUSTVIEW_MODE_TOPOF);
+    adjustView();
 }
 
 void MenuList::selectNext() {
-    if (m_nItems == 0) return;
+    if (m_nItems == 0) {
+        m_selected = -1;
+        adjustView();
+        return;
+    }
     if (m_selected == -1) {
         m_selected = 0;
         m_items[m_selected]->setSelected(true);
-        adjustView(ADJUSTVIEW_MODE_TOPOF);
+        adjustView();
         return;
     }
     m_items[m_selected]->setSelected(false);
-    m_selected = (m_selected >= m_nItems - 1 ? 0 : m_selected + 1);
+    m_selected += 1;
+    if (m_selected >= m_nItems) {
+        m_selected = 0;
+    }
     m_items[m_selected]->setSelected(true);
-    adjustView(ADJUSTVIEW_MODE_BOTTOMOF);
+    adjustView();
 }
 
-void MenuList::adjustView(int mode) {
-    // If nothing selected, then TOPOF puts view top at list top, and BOTTOMOF
-    // puts view bottom at list bottom.
-    if (m_selected == -1) {
-        if (mode == ADJUSTVIEW_MODE_TOPOF) {
-            m_viewFirst = 0;
-        } else {
-            m_viewFirst = m_nItems - m_lines;
-            if (m_viewFirst < 0) {
-                m_viewFirst = 0;
-            }
-        }
-    // With something selected, TOPOF puts selected at view top, BOTTOMOF puts
-    // selected at view bottom, if selected is not already within view.
-    } else {
-        // Do nothing if selected is alreay in view.
-        if (m_selected >= m_viewFirst && m_selected <= m_viewFirst + m_lines - 1) {
-            return;
-        }
-        // Shift the selected item into view according to the mode.
-        if (mode == ADJUSTVIEW_MODE_TOPOF) {
-            m_viewFirst = m_selected;
-        } else {
-            m_viewFirst = m_selected - m_lines + 1;
-        }
-        // Shift view box back within list bounds.
-        if (m_viewFirst + m_lines - 1 > m_nItems) {
-            m_viewFirst = m_nItems - m_lines;
-        }
-        if (m_viewFirst <= 0) {
-            m_viewFirst = 0;
-        }
+void MenuList::adjustView() {
+    Serial.print("adjustView\n");
+    if (m_selected == -1 || m_nItems == 0) {
+        Serial.print("A\n");
+        m_viewFirst = 0;
+        return;
+    }
+    if (m_selected >= m_viewFirst && m_selected < m_viewFirst + m_nLines) {
+        Serial.print("B\n");
+        return;
+    }
+    if (m_selected < m_viewFirst) {
+        Serial.print("C\n");
+        m_viewFirst = m_selected;
+    }
+    if (m_selected >= m_viewFirst + m_nLines) {
+        Serial.print("D\n");
+        m_viewFirst = m_selected - m_nLines + 1;
+    }
+    if (m_viewFirst < 0) {
+        Serial.print("E\n");
+        m_viewFirst = 0;
     }
 }

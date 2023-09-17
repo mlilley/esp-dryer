@@ -10,6 +10,7 @@ class MenuHeader {
     protected:
         const char* m_title;
     public:
+        MenuHeader();
         MenuHeader(const char* title);
         void setTitle(const char* title);
         virtual void render(Adafruit_SSD1306* display);

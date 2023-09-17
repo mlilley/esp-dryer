@@ -1,4 +1,5 @@
 #include "common.h"
+#include "ConfigStore.h"
 #include "MenuHandler.h"
 #include "InputHandler.h"
 #include <Arduino.h>
@@ -11,18 +12,7 @@
 
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
-profile_t profiles[] = {
-    { .name = "PLA",           .temp = 45, .hours = 60 },
-    { .name = "PETG",          .temp = 60, .hours = 60 },
-    { .name = "ABS",           .temp = 70, .hours = 60 },
-    { .name = "ASA",           .temp = 80, .hours = 60 },
-    { .name = "TPU",           .temp = 45, .hours = 40 },
-    { .name = "Nylon",         .temp = 80, .hours = 60 },
-    { .name = "Polycarbonate", .temp = 80, .hours = 100 },
-    { .name = "Custom 1",      .temp = 40, .hours = 240 },
-    { .name = "Custom 2",      .temp = 50, .hours = 120 },
-    { .name = "Custom 3",      .temp = 60, .hours = 60 },
-};
+static ConfigStore config = ConfigStore();
 
 void setup() {
     Serial.begin(9600);
@@ -34,9 +24,11 @@ void setup() {
     }
     display.cp437(true);
 
+    config.load();
+
     xQueueHandle queueInput = xQueueCreate(100, sizeof(input_t));
 
-    setupMenuHandler(&display, profiles, 10, queueInput);
+    setupMenuHandler(&config, queueInput, &display);
     setupInputHandler(GPIO_BUTTONUP, GPIO_BUTTONDOWN, GPIO_BUTTONOK, GPIO_BUTTONBACK, queueInput);
 
     xTaskCreate(taskMenuHandler, "MenuHandler", 5000, NULL, 1, NULL);

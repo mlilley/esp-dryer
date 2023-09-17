@@ -13,7 +13,7 @@ HomePage::HomePage() : MenuPage() {
 void HomePage::activate(bool reset) {
     MenuPage::activate(reset);
     if (reset) {
-        m_list->selectItem(0);
+        m_list->setSelected(0);
         m_selected = 0;
     }
 }

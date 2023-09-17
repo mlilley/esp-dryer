@@ -1,5 +1,9 @@
 #include "MenuHeader.h"
 
+MenuHeader::MenuHeader() {
+    m_title = "";
+}
+
 MenuHeader::MenuHeader(const char* title) {
     m_title = title;
 }
