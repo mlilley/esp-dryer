@@ -4,6 +4,7 @@
 #include "HomePage.h"
 #include "SelectProfilePage.h"
 #include "ConfirmProfilePage.h"
+#include "SettingsPage.h"
 
 static ConfigStore* _config;
 static xQueueHandle _queueInput;
@@ -12,6 +13,7 @@ static Adafruit_SSD1306* _display;
 static HomePage* _homePage;
 static SelectProfilePage* _selectProfilePage;
 static ConfirmProfilePage* _confirmProfilePage;
+static SettingsPage* _settingsPage;
 
 void setupMenuHandler(ConfigStore* config, xQueueHandle queueInput, Adafruit_SSD1306* display) {
     _config = config;
@@ -21,6 +23,7 @@ void setupMenuHandler(ConfigStore* config, xQueueHandle queueInput, Adafruit_SSD
     _homePage = new HomePage();
     _selectProfilePage = new SelectProfilePage(_config);
     _confirmProfilePage = new ConfirmProfilePage(_config);
+    _settingsPage = new SettingsPage(_config);
 }
 
 typedef struct transition_t {
@@ -34,9 +37,8 @@ transition_t afterInput_HomePage() {
             // Start selected
             return (transition_t){ _selectProfilePage, true };
         } else if (*((int*)(_homePage->getAcceptedValue())) == 1) {
-            // Settings selected (TODO)
-            // return (transition_t){ _settingsPage, true };
-            _homePage->activate(false);
+            // Settings selected
+            return (transition_t){ _settingsPage, true };
         }
     }
     return (transition_t){};
@@ -63,6 +65,13 @@ transition_t afterInput_ConfirmProfilePage() {
     return (transition_t){};
 }
 
+transition_t afterInput_SettingsPage() {
+    if (_settingsPage->isAccepted() || _settingsPage->isCancelled()) {
+        return (transition_t){ _homePage, false };
+    }
+    return (transition_t){};
+}
+
 MenuPage* handleInput(input_t input, MenuPage* currentPage) {
     transition_t transition;
 
@@ -74,6 +83,8 @@ MenuPage* handleInput(input_t input, MenuPage* currentPage) {
         transition = afterInput_SelectProfilePage();
     } else if (currentPage == _confirmProfilePage) {
         transition = afterInput_ConfirmProfilePage();
+    } else if (currentPage == _settingsPage) {
+        transition = afterInput_SettingsPage();
     }
 
     if (transition.toPage != NULL) {

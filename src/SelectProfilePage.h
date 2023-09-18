@@ -14,8 +14,9 @@ class SelectProfilePage : public MenuPage {
         MenuHeader m_header;
         MenuList m_list;
         MenuItem* m_items[CONFIG_PROFILES_MAX];
-    protected:
         int m_value;
+    protected: 
+        void _reloadProfiles(void);
     public:
         SelectProfilePage(ConfigStore* pConfig);
         void activate(bool reset);

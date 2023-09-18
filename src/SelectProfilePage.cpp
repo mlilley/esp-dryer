@@ -5,18 +5,20 @@ SelectProfilePage::SelectProfilePage(ConfigStore* pConfig)
     m_pConfig = pConfig;
     m_header.setTitle("Select Profile");
     
-    int nProfiles = m_pConfig->getNumProfiles();
-    for (int i = 0; i < nProfiles; i++) {
-        m_items[i] = new MenuItem(pConfig->getProfile(i)->name);
+    int nProfiles = 0;
+    for (int i = 0; i < CONFIG_PROFILES_MAX; i++) {
+        m_items[i] = new MenuItem();
     }
 
     m_list.setLayout(0, 14, SCREEN_W, 5);
     m_list.setScrollbarEnabled(true);
-    m_list.setItems(m_items, nProfiles);
+    m_list.setItems(m_items, 0);
+    m_list.setSelected(-1);
 }
 
 void SelectProfilePage::activate(bool reset) {
     MenuPage::activate(reset);
+    _reloadProfiles();
     if (reset) {
         m_list.setSelected(0);
     }
@@ -43,4 +45,12 @@ bool SelectProfilePage::handleInput(input_t input) {
             return true;
     }
     return false;
+}
+
+void SelectProfilePage::_reloadProfiles(void) {
+    int nProfiles = m_pConfig->getNumProfiles();
+    for (int i = 0; i < nProfiles; i++) {
+        m_items[i]->setTitle(m_pConfig->getProfile(i)->name);
+    }
+    m_list.setItems(m_items, nProfiles);
 }

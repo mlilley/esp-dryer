@@ -62,3 +62,9 @@ Font size 1 is 6px wide, giving 21 chars across + 2px.
                                                          +---|    |---+ 
                                                              +----+
 ```
+
+# TODO
+
+User Profile resetting - should it be allowed?
+  - if yes, reset to what?
+  - if no, need way to remove reset entry from confirm page

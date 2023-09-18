@@ -1,6 +1,7 @@
 #include "MenuEditableIntItem.h"
 
-MenuEditableIntItem::MenuEditableIntItem(const char* title, int value, int min, int max, int wchars, const char* fmt, intTransformer_t transformer, intMutator_t mutator) : MenuEditableItem(title) {
+MenuEditableIntItem::MenuEditableIntItem(const char* title, int value, int min, int max, int wchars, const char* fmt, intTransformer_t transformer, intMutator_t mutator) 
+        : MenuEditableItem(title) {
     m_value = value;
     m_min = min;
     m_max = max;

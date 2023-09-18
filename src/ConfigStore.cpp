@@ -12,122 +12,209 @@ static char keybuf[50];
 #define KEY_PROFILE_TEMP  "P_%02d_TEMP"
 #define KEY_PROFILE_HOURS "P_%02d_HOURS"
 #define KEY_PROFILE_STATE "P_%02d_STATE"
+#define KEY_TEMPUNITS     "TEMP_UNITS"
 
 ConfigStore::ConfigStore() {
-    m_numProfiles = 0;
+    m_loaded = false;
 }
 
 void ConfigStore::load() {
     Preferences prefs;
     prefs.begin(NAMESPACE_NAME, false);
-
-    if (!prefs.getBool(KEY_INITIALIZED, false)) {
-        _initializeStore(&prefs);
-    } else {
-        m_numProfiles = prefs.getInt(KEY_NUM_PROFILES, 0);
-        if (m_numProfiles > CONFIG_PROFILES_MAX) {
-            m_numProfiles = CONFIG_PROFILES_MAX;
-        }
-
-        for (int i = 0; i < m_numProfiles; i++) {
-            _readProfile(&prefs, i);
-        }
-
-        for (int i = m_numProfiles; i < CONFIG_PROFILES_MAX; i++) {
-            _clearProfile(i, PROFILE_STATE_EMPTY_MASK | PROFILE_STATE_USER_MASK);
-        }
-
-        for (int i = 0; i < m_numProfiles; i++) {
-            if (!_isProfileValid(i)) {
-                _errorProfile(i);
-            }
-        }
-    }
-
+    _initializeRom(&prefs, false);
+    _readRom(&prefs);
     prefs.end();
+    m_loaded = true;
 }
 
-void ConfigStore::writeProfile(int index) {
-    if (index < 0 || index >= CONFIG_PROFILES_MAX) {
-        return;
-    }
-
+void ConfigStore::reset() {
     Preferences prefs;
     prefs.begin(NAMESPACE_NAME, false);
-
-    _writeProfile(&prefs, index);
-
+    _initializeRom(&prefs, true);
+    _readRom(&prefs);
     prefs.end();
+    m_loaded = true;
+}
+
+int ConfigStore::getTempUnits() {
+    if (!m_loaded) {
+        load();
+    }
+    return m_tempUnits;
 }
 
 int ConfigStore::getNumProfiles() {
-    return m_numProfiles;
+    if (!m_loaded) {
+        load();
+    }
+    return m_nProfiles;
 }
 
-profile_t* ConfigStore::getProfile(int index) {
-    if (index < 0 || index >= CONFIG_PROFILES_MAX) {
-        return NULL;
+const profile_t* ConfigStore::getProfile(int index) {
+    if (!m_loaded) {
+        load();
     }
+    if (index < 0 || index >= m_nProfiles) {
+        return &DEF_ZERO_PROFILE;
+    }
+    // DONT CHANGE RESULT
     return &m_profiles[index];
 }
 
-void ConfigStore::_initializeStore(Preferences* prefs) {
-    prefs->clear();
-
-    m_numProfiles = sizeof(PROFILES) / sizeof(profile_t);
-
-    for (int i = 0; i < m_numProfiles; i++) {
-        strcpy(m_profiles[i].name, PROFILES[i].name);
-        m_profiles[i].temp = PROFILES[i].temp;
-        m_profiles[i].hours = PROFILES[i].hours;
-        m_profiles[i].state = PROFILES[i].state;
+void ConfigStore::setTempUnits(int value) {
+    if (!m_loaded) {
+        load();
     }
-
-    for (int i = m_numProfiles; i < CONFIG_PROFILES_MAX; i++) {
-        _clearProfile(i, PROFILE_STATE_EMPTY_MASK | PROFILE_STATE_USER_MASK);
+    if (value == 0 || value == 1) {
+        m_tempUnits = value;
     }
-    
-    for (int i = 0; i < CONFIG_PROFILES_MAX; i++) {
-        _writeProfile(prefs, i);
-    }
-    
-    prefs->putBool(KEY_INITIALIZED, true);
-    prefs->putInt(KEY_NUM_PROFILES, m_numProfiles);
 }
 
-void ConfigStore::_readProfile(Preferences* prefs, int index) {
+void ConfigStore::setProfile(int index, profile_t* profile) {
+    if (!m_loaded) {
+        load();
+    }
+    if (index >= 0 && index < m_nProfiles) {
+        strcpy(m_profiles[index].name, profile->name);
+        m_profiles[index].temp = profile->temp;
+        m_profiles[index].hours = profile->hours;
+        m_profiles[index].state = profile->state;
+    }
+}
+
+void ConfigStore::persistTempUnits() {
+    if (!m_loaded) { // necessary if setTempUnits was not called
+        load();
+    } 
+    Preferences prefs;
+    prefs.begin(NAMESPACE_NAME, false);
+    _writeTempUnits(&prefs, m_tempUnits);
+    prefs.end();
+}
+
+void ConfigStore::persistProfile(int index) {
+    if (!m_loaded) { // necessary if setProfile was not called
+        load();
+    }
+    if (index < 0 || index >= CONFIG_PROFILES_MAX) {
+        return;
+    }
+    Preferences prefs;
+    prefs.begin(NAMESPACE_NAME, false);
+    _writeProfile(&prefs, index, &m_profiles[index]);
+    prefs.end();
+}
+
+void ConfigStore::resetProfile(int index) {
+    if (!m_loaded) { 
+        load();
+    }
+    if (index < 0 || index >= m_nProfiles) {
+        return;
+    }
+    if (index < 0 || index >= sizeof(DEF_PROFILES) / sizeof(profile_t)) {
+        return;
+    }
+    Preferences prefs;
+    prefs.begin(NAMESPACE_NAME, false);
+    _writeProfile(&prefs, index, &DEF_PROFILES[index]);
+    _safeReadProfile(&prefs, index);
+    prefs.end();
+}
+
+void ConfigStore::dump() {
+    Serial.print("CONFIG:\n");
+    Serial.printf("  TempUnits: %d\n", m_tempUnits);
+    Serial.printf("  NumProfiles: %d\n", m_nProfiles);
+    for (int i = 0; i < m_nProfiles; i++) {
+        Serial.printf("  Profile %d:\n", i);
+        Serial.printf("    Name: %s\n", m_profiles[i].name);
+        Serial.printf("    Temp: %d\n", m_profiles[i].temp);
+        Serial.printf("    Hours: %d\n", m_profiles[i].hours);
+        Serial.printf("    State: %d\n", m_profiles[i].state);
+    }
+}
+
+// ---
+
+void ConfigStore::_initializeRom(Preferences* prefs, bool force) {
+    if (!prefs->getBool(KEY_INITIALIZED) || force) {
+        prefs->putBool(KEY_INITIALIZED, true);
+        _writeTempUnits(prefs, DEF_TEMP_UNITS);
+        _writeProfiles(prefs, DEF_PROFILES, sizeof(DEF_PROFILES) / sizeof(profile_t));
+    }
+}
+
+void ConfigStore::_writeTempUnits(Preferences* prefs, int value) {
+    prefs->putInt(KEY_TEMPUNITS, value);
+}
+
+void ConfigStore::_writeProfiles(Preferences* prefs, const profile_t profiles[], int nProfiles) {
+    prefs->putInt(KEY_NUM_PROFILES, nProfiles);
+    for (int i = 0; i < nProfiles; i++) {
+        _writeProfile(prefs, i, &profiles[i]);
+    }
+    for (int i = nProfiles; i < CONFIG_PROFILES_MAX; i++) {
+        _writeProfile(prefs, i, &DEF_ZERO_PROFILE);
+    }
+}
+
+void ConfigStore::_writeProfile(Preferences* prefs, int index, const profile_t* profile) {
+    sprintf(keybuf, KEY_PROFILE_NAME, index);
+    prefs->putString(keybuf, profile->name);
+    sprintf(keybuf, KEY_PROFILE_TEMP, index);
+    prefs->putInt(keybuf, profile->temp);
+    sprintf(keybuf, KEY_PROFILE_HOURS, index);
+    prefs->putInt(keybuf, profile->hours);
+    sprintf(keybuf, KEY_PROFILE_STATE, index);
+    prefs->putInt(keybuf, profile->state);
+}
+
+void ConfigStore::_readRom(Preferences* prefs) {
+    _safeReadTempUnits(prefs);
+    _safeReadProfiles(prefs);
+}
+
+void ConfigStore::_safeReadTempUnits(Preferences* prefs) {
+    m_tempUnits = prefs->getInt(KEY_TEMPUNITS, 0);
+    if (m_tempUnits != 0 && m_tempUnits != 1) {
+        m_tempUnits = 0;
+    }
+}
+
+void ConfigStore::_safeReadProfiles(Preferences* prefs) {
+    m_nProfiles = prefs->getInt(KEY_NUM_PROFILES, 0);
+    if (m_nProfiles > CONFIG_PROFILES_MAX) {
+        m_nProfiles = CONFIG_PROFILES_MAX;
+    }
+    for (int i = 0; i < CONFIG_PROFILES_MAX; i++) {
+        _safeReadProfile(prefs, i);
+    }
+}
+
+void ConfigStore::_safeReadProfile(Preferences* prefs, int index) {
     sprintf(keybuf, KEY_PROFILE_NAME, index);
     prefs->getString(keybuf, m_profiles[index].name, PROFILE_NAME_MAX + 1);
-
     sprintf(keybuf, KEY_PROFILE_TEMP, index);
     m_profiles[index].temp = prefs->getInt(keybuf, -1);
-
     sprintf(keybuf, KEY_PROFILE_HOURS, index);
     m_profiles[index].hours = prefs->getInt(keybuf, -1);
-
     sprintf(keybuf, KEY_PROFILE_STATE, index);
     m_profiles[index].state = prefs->getBool(keybuf, false);
-}
 
-void ConfigStore::_writeProfile(Preferences* prefs, int index) {
-    sprintf(keybuf, KEY_PROFILE_NAME, index);
-    prefs->putString(keybuf, m_profiles[index].name);
-
-    sprintf(keybuf, KEY_PROFILE_TEMP, index);
-    prefs->putInt(keybuf, m_profiles[index].temp);
-
-    sprintf(keybuf, KEY_PROFILE_HOURS, index);
-    prefs->putInt(keybuf, m_profiles[index].hours);
-
-    sprintf(keybuf, KEY_PROFILE_STATE, index);
-    prefs->putInt(keybuf, m_profiles[index].state);
-}
-
-void ConfigStore::_clearProfile(int index, int state) {
-    strcpy(m_profiles[index].name, "");
-    m_profiles[index].temp = TEMP_MIN;
-    m_profiles[index].hours = HOURS_MIN;
-    m_profiles[index].state = state;
+    int n = strnlen(m_profiles[index].name, PROFILE_NAME_MAX + 1);
+    if (n == PROFILE_NAME_MAX + 1) {
+        _errorProfile(index);
+        return;
+    }
+    if (m_profiles[index].temp < TEMP_MIN || m_profiles[index].temp > TEMP_MAX) {
+        _errorProfile(index);
+        return;
+    }
+    if (m_profiles[index].hours < HOURS_MIN || m_profiles[index].hours > HOURS_MAX) {
+        _errorProfile(index);
+        return;
+    }
 }
 
 void ConfigStore::_errorProfile(int index) {
@@ -135,21 +222,4 @@ void ConfigStore::_errorProfile(int index) {
     m_profiles[index].temp = TEMP_MIN;
     m_profiles[index].hours = HOURS_MIN;
     m_profiles[index].state = m_profiles[index].state | PROFILE_STATE_ERROR_MASK;
-}
-
-bool ConfigStore::_isProfileValid(int index) {
-    if (PROFILE_IS_ERROR(m_profiles[index]) || PROFILE_IS_EMPTY(m_profiles[index])) {
-        return true; // dont care about the reset of the profile
-    }
-    int n = strnlen(m_profiles[index].name, PROFILE_NAME_MAX + 1);
-    if (n == 0 || n == PROFILE_NAME_MAX + 1) {
-        return false;
-    }
-    if (m_profiles[index].temp < TEMP_MIN || m_profiles[index].temp > TEMP_MAX) {
-        return false;
-    }
-    if (m_profiles[index].hours < HOURS_MIN || m_profiles[index].hours > HOURS_MAX) {
-        return false;
-    }
-    return true;
 }

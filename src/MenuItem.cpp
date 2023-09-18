@@ -1,5 +1,10 @@
 #include "MenuItem.h"
 
+MenuItem::MenuItem() {
+    m_title = "";
+    m_selected = false;
+}
+
 MenuItem::MenuItem(const char* title) {
     m_title = title;
     m_selected = false;

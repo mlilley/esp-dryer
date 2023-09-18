@@ -1,35 +1,33 @@
-#ifndef __CONFIRM_PROFILE_PAGE_H__
-#define __CONFIRM_PROFILE_PAGE_H__
+#ifndef __SETTINGS_PAGE_H__
+#define __SETTINGS_PAGE_H__
 
 #include "common.h"
 #include "ConfigStore.h"
 #include "MenuPage.h"
 #include "MenuHeader.h"
 #include "MenuList.h"
+#include "MenuEditableTempUnitsItem.h"
 #include "MenuDialog.h"
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_SSD1306.h> 
 
-class ConfirmProfilePage : public MenuPage {
+class SettingsPage : public MenuPage {
     protected:
         ConfigStore* m_pConfig;
         MenuHeader m_header;
-        MenuItem* m_items[5];
         MenuList m_list;
-        MenuDialog m_saveDialog;
+        MenuItem* m_items[5];
         MenuDialog m_resetDialog;
-        int m_profile;
-        bool m_showSaveDialog;
         bool m_showResetDialog;
 
     protected:
         void refresh();
 
     public:
-        ConfirmProfilePage(ConfigStore* config);
-        void setProfile(int index);
+        SettingsPage(ConfigStore* pConfig);
         void activate(bool reset);
         virtual void render(Adafruit_SSD1306* display);
         virtual bool handleInput(input_t input);
+        void onTempUnitChange();
 };
 
 #endif

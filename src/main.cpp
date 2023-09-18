@@ -10,8 +10,7 @@
 #define MENU_QUEUE_MSG_B  2
 #define MENU_QUEUE_MSG_OK 3
 
-Adafruit_SSD1306 display(128, 64, &Wire, -1);
-
+static Adafruit_SSD1306 display(128, 64, &Wire, -1);
 static ConfigStore config = ConfigStore();
 
 void setup() {
@@ -25,6 +24,7 @@ void setup() {
     display.cp437(true);
 
     config.load();
+    // config.dump();
 
     xQueueHandle queueInput = xQueueCreate(100, sizeof(input_t));
 

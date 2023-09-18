@@ -13,6 +13,15 @@ int hoursMutator(int value, bool up, bool longpress) {
     return value + (up ? 5 : -5) * (longpress ? 10 : 1);
 }
 
+void ConfirmProfilePage::refresh() {
+    const profile_t* profile = m_pConfig->getProfile(m_profile);
+    ((MenuEditableIntItem*)m_items[1])->setValue(profile->temp);
+    ((MenuEditableIntItem*)m_items[2])->setValue(profile->hours);
+    if (PROFILE_IS_USER((*profile))) {
+
+    }
+}
+
 ConfirmProfilePage::ConfirmProfilePage(ConfigStore* pConfig) 
         : m_header(), m_list(), m_items(), m_saveDialog(), m_resetDialog() {
     m_pConfig = pConfig;
@@ -39,10 +48,8 @@ ConfirmProfilePage::ConfirmProfilePage(ConfigStore* pConfig)
 }
 
 void ConfirmProfilePage::setProfile(int index) {
-    profile_t* profile = m_pConfig->getProfile(index);
-
-    ((MenuEditableIntItem*)m_items[1])->setValue(profile->temp);
-    ((MenuEditableIntItem*)m_items[2])->setValue(profile->hours);
+    m_profile = index;
+    refresh();
 }
 
 void ConfirmProfilePage::activate(bool reset) {
@@ -69,20 +76,30 @@ bool ConfirmProfilePage::handleInput(input_t input) {
     if (m_showSaveDialog) {
         m_saveDialog.handleInput(input);
         if (m_saveDialog.getState() == MenuDialog::STATE_OK) {
-            // do save
+            // save oked
+            const profile_t* profile = m_pConfig->getProfile(m_profile);
+            profile_t newProfile;
+            strcpy(newProfile.name, profile->name);
+            newProfile.temp = ((MenuEditableIntItem*)m_items[1])->getValue();
+            newProfile.hours = ((MenuEditableIntItem*)m_items[2])->getValue();
+            newProfile.state = profile->state;
+            m_pConfig->setProfile(m_profile, &newProfile);
+            m_pConfig->persistProfile(m_profile);
             m_showSaveDialog = false;
         } else if (m_saveDialog.getState() == MenuDialog::STATE_CANCEL) {
-            // do cancel
+            // save cancelled
             m_showSaveDialog = false;
         }
         return true;
     } else if (m_showResetDialog) {
         m_resetDialog.handleInput(input);
         if (m_resetDialog.getState() == MenuDialog::STATE_OK) {
-            // do reset
+            // reset oked
+            m_pConfig->resetProfile(m_profile);
+            refresh();
             m_showResetDialog = false;
         } else if (m_resetDialog.getState() == MenuDialog::STATE_CANCEL) {
-            // do cancel
+            // reset cancelled
             m_showResetDialog = false;
         }
         return true;

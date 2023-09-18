@@ -36,7 +36,6 @@ void MenuList::setItems(MenuItem* items[], int nItems) {
         m_items[i] = items[i];
     }
     m_nItems = n;
-    m_selected = -1;
     adjustView();
 }
 

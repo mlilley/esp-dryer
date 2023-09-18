@@ -69,6 +69,7 @@ void MenuDialog::render(Adafruit_SSD1306* display) {
 }
 
 bool MenuDialog::handleInput(input_t input) {
+    
     switch (input.button) {
         case BUTTON_UP:
         case BUTTON_DOWN:

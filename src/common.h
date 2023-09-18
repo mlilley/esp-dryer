@@ -35,4 +35,6 @@ typedef char* (*intTransformer_t)(int, int);
 
 typedef int (*intMutator_t)(int value, bool up, bool longpress);
 
+typedef void (*onChange_t)(void* inst);
+
 #endif
