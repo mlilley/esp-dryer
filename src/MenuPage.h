@@ -1,22 +1,24 @@
 #ifndef __MENU_PAGE_H__
 #define __MENU_PAGE_H__
 
+#include <Arduino.h>
 #include "common.h"
-#include <Adafruit_SSD1306.h>
+#include "display.h"
+#include "MenuPageCompletionHandler.h"
+
+#define MENU_PAGE_RESULT_OK 1
+#define MENU_PAGE_RESULT_BACK 0
 
 class MenuPage {
     protected:
-        bool m_accepted;
-        bool m_cancelled;
-        void* m_acceptedValue;
+        IMenuPageCompletionHandler* m_onComplete;
+
     public:
         MenuPage();
-        bool isAccepted();
-        bool isCancelled();
+        virtual void onComplete(IMenuPageCompletionHandler* onComplete);
         virtual void activate(bool reset);
-        void* getAcceptedValue();
-        virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(input_t input);
+        virtual void render(display_t* display);
+        virtual bool handleInput(input_t* input);
 };
 
 #endif

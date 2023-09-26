@@ -1,20 +1,26 @@
 #ifndef __HOME_PAGE_H__
 #define __HOME_PAGE_H__
 
+#include <Arduino.h>
 #include "common.h"
+#include "display.h"
 #include "MenuPage.h"
 #include "MenuList.h"
-#include <Adafruit_SSD1306.h>
+#include "MenuItem.h"
 
 class HomePage : public MenuPage {
     protected:
+        ConfigStore* m_config;
         MenuList* m_list;
-        int m_selected;
+        MenuItem* m_items[2];
+
     public:
-        HomePage();
+        HomePage(ConfigStore* config);
         void activate(bool reset);
-        virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(input_t input);
+        int getSelected();
+        virtual void render(display_t* display);
+        virtual bool handleInput(input_t* input);
+
 };
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef __CONFIG_STORE_H__
 #define __CONFIG_STORE_H__
 
+#include <Arduino.h>
 #include "common.h"
 #include "profile.h"
 #include <Preferences.h>

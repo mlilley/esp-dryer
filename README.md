@@ -36,6 +36,13 @@ build_flags = -D SSD1306_NO_SPLASH
 
 Font size 1 is 6px wide, giving 21 chars across + 2px.
 
+
+The 1.3" SSH1106 i2c 128x64 is not driver-compatible with SSD1306, but similar.
+This driver https://github.com/prenticedavid/Adafruit_SH1106_kbv is api compatible with the Adafruit SSD1306 drvier minus some
+text scrolling features. Place in dir under /lib.
+
+
+
 # uC Pinout
 
 ```

@@ -1,21 +1,34 @@
 #ifndef __MENU_EDITABLE_ITEM_H__
 #define __MENU_EDITABLE_ITEM_H__
 
+#include <Arduino.h>
 #include "common.h"
+#include "display.h"
 #include "MenuItem.h"
-#include <Adafruit_SSD1306.h>
+#include "MenuEditableItemDelegate.h"
+#include "MenuEditableItemChangeHandler.h"
+
+class MenuEditableItemDelegate;
 
 class MenuEditableItem : public MenuItem {
+    friend class MenuEditableItemDelegate;
+
     protected:
         bool m_editing;
-        onChange_t m_onChange;
-        void* m_onChangeMethodInstance;
+        MenuEditableItemDelegate* m_delegate;
+        IMenuEditableItemChangeHandler* m_onChange;
+
+        void commit(void);
+        void reject(void);
 
     public:
-        MenuEditableItem(const char* title);
-        void setChangeHandler(onChange_t handler, void* methodInstance);
-        virtual void render(Adafruit_SSD1306* display, int x, int y, int w);
-        virtual bool handleInput(input_t input);
+        MenuEditableItem(const char* title, MenuEditableItemDelegate* delegate);
+        bool isEditing(void);
+        void onChange(IMenuEditableItemChangeHandler* onChange);
+        MenuEditableItemDelegate* getDelegate();
+
+        virtual void render(display_t* display, int x, int y, int w, int h);
+        virtual bool handleInput(input_t* input);
 };
 
 #endif

@@ -26,6 +26,9 @@
 #define BUTTON_OK 2
 #define BUTTON_BACK 3
 
+#define UNITS_C 0
+#define UNITS_F 1
+
 typedef struct input_t {
     int button;
     bool longpress;

@@ -1,55 +1,38 @@
 #include "ConfirmProfilePage.h"
 
-#include "MenuEditableIntItem.h"
-
-char* hoursTransformer(int value, int wchars) {
-    double val = ((double)value)/10.0;
-    char* str = (char*)malloc(sizeof(char)*(wchars+1));
-    sprintf(str, "%4.1f", val);
-    return str;
-}
-
-int hoursMutator(int value, bool up, bool longpress) {
-    return value + (up ? 5 : -5) * (longpress ? 10 : 1);
-}
-
-void ConfirmProfilePage::refresh() {
-    const profile_t* profile = m_pConfig->getProfile(m_profile);
-    ((MenuEditableIntItem*)m_items[1])->setValue(profile->temp);
-    ((MenuEditableIntItem*)m_items[2])->setValue(profile->hours);
-    if (PROFILE_IS_USER((*profile))) {
-
-    }
-}
-
-ConfirmProfilePage::ConfirmProfilePage(ConfigStore* pConfig) 
-        : m_header(), m_list(), m_items(), m_saveDialog(), m_resetDialog() {
-    m_pConfig = pConfig;
-    m_header.setTitle("Confirm Profile");
+ConfirmProfilePage::ConfirmProfilePage(ConfigStore* config) : MenuPage(), m_config(config) {
+    m_header = new MenuHeader("Confirm Profile");
 
     m_items[0] = new MenuItem("START");
-    m_items[1] = new MenuEditableIntItem("Temp", 0, TEMP_MIN, TEMP_MAX, 4, "%2d""\xF8""C", NULL, NULL);
-    m_items[2] = new MenuEditableIntItem("Hours", 0, HOURS_MIN, HOURS_MAX, 4, NULL, &hoursTransformer, &hoursMutator);
-    m_items[3] = new MenuItem("Save profile");
-    m_items[4] = new MenuItem("Reset profile");
+    m_items[1] = new MenuEditableItem("Temp", new TempDelegate(config, 0));
+    m_items[2] = new MenuEditableItem("Time", new HoursDelegate(config, 0));
+    m_items[3] = new MenuItem("Save Profile");
+    m_items[4] = new MenuItem("Reset Profile");
 
-    m_list.setLayout(0, 14, SCREEN_W, 5);
-    m_list.setScrollbarEnabled(true);
-    m_list.setItems(m_items, 5);
+    m_items[0]->onClick(new MenuItemClickHandler<ConfirmProfilePage>(this, &ConfirmProfilePage::onStartClick));
+    m_items[3]->onClick(new MenuItemClickHandler<ConfirmProfilePage>(this, &ConfirmProfilePage::onSaveClick));
+    m_items[4]->onClick(new MenuItemClickHandler<ConfirmProfilePage>(this, &ConfirmProfilePage::onResetClick));
 
-    m_saveDialog.setKind(MenuDialog::KIND_OKCANCEL);
-    m_saveDialog.setMsg("Save profile", "settings?");
-    
-    m_resetDialog.setKind(MenuDialog::KIND_OKCANCEL);
-    m_resetDialog.setMsg("Reset profile", "to factory?");
+    m_list = new MenuList();
+    m_list->setLayout(0, 14, SCREEN_W, 5);
+    m_list->setScrollbar(true);
+
+    m_list->addItem(m_items[0]);
+    m_list->addItem(m_items[1]);
+    m_list->addItem(m_items[2]);
+    m_list->addItem(m_items[3]);
+    m_list->addItem(m_items[4]);
+
+    m_saveDialog = new MenuDialog(MenuDialog::KIND_OKCANCEL);
+    m_saveDialog->setMsg("Save profile", "settings?");
+    m_saveDialog->onClose(new MenuDialogCloseHandler<ConfirmProfilePage>(this, &ConfirmProfilePage::onSaveDialogClose));
+        
+    m_resetDialog = new MenuDialog(MenuDialog::KIND_OKCANCEL);
+    m_resetDialog->setMsg("Reset profile", "to factory?");
+    m_resetDialog->onClose(new MenuDialogCloseHandler<ConfirmProfilePage>(this, &ConfirmProfilePage::onResetDialogClose));
 
     m_showSaveDialog = false;
     m_showResetDialog = false;
-}
-
-void ConfirmProfilePage::setProfile(int index) {
-    m_profile = index;
-    refresh();
 }
 
 void ConfirmProfilePage::activate(bool reset) {
@@ -57,75 +40,84 @@ void ConfirmProfilePage::activate(bool reset) {
     m_showSaveDialog = false;
     m_showResetDialog = false;
     if (reset) {
-        m_list.setSelected(0);
+        m_list->setSelected(0);
     }
 }
 
-void ConfirmProfilePage::render(Adafruit_SSD1306* display) {
+void ConfirmProfilePage::setProfile(int index) {
+    m_profile = index;
+    const profile_t* profile = m_config->getProfile(index);
+    ((TempDelegate*)((MenuEditableItem*)m_items[1])->getDelegate())->setValue(profile->temp);
+    ((HoursDelegate*)((MenuEditableItem*)m_items[2])->getDelegate())->setValue(profile->hours);
+}
+
+profile_t ConfirmProfilePage::getConfirmedProfile(void) {
+    profile_t profile = {
+        .temp = ((TempDelegate*)((MenuEditableItem*)m_items[1])->getDelegate())->getValue(),
+        .hours = ((HoursDelegate*)((MenuEditableItem*)m_items[2])->getDelegate())->getValue(),
+        .state = m_config->getProfile(m_profile)->state
+    };
+    strcpy(profile.name, m_config->getProfile(m_profile)->name);
+    return profile;
+}
+
+void ConfirmProfilePage::render(display_t* display) {
     MenuPage::render(display);
-    m_header.render(display);
-    m_list.render(display);
+    m_header->render(display);
+    m_list->render(display);
     if (m_showSaveDialog) {
-        m_saveDialog.render(display);
+        m_saveDialog->render(display);
     } else if (m_showResetDialog) {
-        m_resetDialog.render(display);
+        m_resetDialog->render(display);
     }
 }
 
-bool ConfirmProfilePage::handleInput(input_t input) {
+bool ConfirmProfilePage::handleInput(input_t* input) {
     if (m_showSaveDialog) {
-        m_saveDialog.handleInput(input);
-        if (m_saveDialog.getState() == MenuDialog::STATE_OK) {
-            // save oked
-            const profile_t* profile = m_pConfig->getProfile(m_profile);
-            profile_t newProfile;
-            strcpy(newProfile.name, profile->name);
-            newProfile.temp = ((MenuEditableIntItem*)m_items[1])->getValue();
-            newProfile.hours = ((MenuEditableIntItem*)m_items[2])->getValue();
-            newProfile.state = profile->state;
-            m_pConfig->setProfile(m_profile, &newProfile);
-            m_pConfig->persistProfile(m_profile);
-            m_showSaveDialog = false;
-        } else if (m_saveDialog.getState() == MenuDialog::STATE_CANCEL) {
-            // save cancelled
-            m_showSaveDialog = false;
-        }
-        return true;
+        return m_saveDialog->handleInput(input);
     } else if (m_showResetDialog) {
-        m_resetDialog.handleInput(input);
-        if (m_resetDialog.getState() == MenuDialog::STATE_OK) {
-            // reset oked
-            m_pConfig->resetProfile(m_profile);
-            refresh();
-            m_showResetDialog = false;
-        } else if (m_resetDialog.getState() == MenuDialog::STATE_CANCEL) {
-            // reset cancelled
-            m_showResetDialog = false;
-        }
+        return m_resetDialog->handleInput(input);
+    }
+    if (m_list->handleInput(input)) {
         return true;
     }
-    if (m_list.handleInput(input)) {
-        return true;
+    return MenuPage::handleInput(input);
+}
+
+void ConfirmProfilePage::onStartClick(void) {
+    if (m_onComplete != nullptr) {
+        (*m_onComplete)(MENU_PAGE_RESULT_OK);
     }
-    switch (input.button) {
-        case BUTTON_OK:
-            switch (m_list.getSelected()) {
-                case 0: // start
-                    m_accepted = true;
-                    return true;
-                case 3: // save
-                    m_saveDialog.activate(1);
-                    m_showSaveDialog = true;
-                    return true;
-                case 4: // reset
-                    m_resetDialog.activate(1);
-                    m_showResetDialog = true;
-                    return true;
-            }
-            return false;
-        case BUTTON_BACK:
-            m_cancelled = true;
-            return false;
+}
+
+void ConfirmProfilePage::onSaveClick(void) {
+    m_showSaveDialog = true;
+    m_saveDialog->activate(1);
+}
+
+void ConfirmProfilePage::onResetClick(void) {
+    m_showResetDialog = true;
+    m_saveDialog->activate(1);
+}
+
+void ConfirmProfilePage::onSaveDialogClose(int result) {
+    if (result == MenuDialog::RESULT_OK) {
+        profile_t profile = {
+            .temp = ((TempDelegate*)((MenuEditableItem*)m_items[1])->getDelegate())->getValue(),
+            .hours = ((HoursDelegate*)((MenuEditableItem*)m_items[2])->getDelegate())->getValue(),
+            .state = m_config->getProfile(m_profile)->state
+        };
+        strcpy(profile.name, m_config->getProfile(m_profile)->name);
+        m_config->setProfile(m_profile, &profile);
+        m_config->persistProfile(m_profile);
     }
-    return false;
+    m_showSaveDialog = false;
+}
+
+void ConfirmProfilePage::onResetDialogClose(int result) {
+    if (result == MenuDialog::RESULT_OK) {
+        m_config->resetProfile(m_profile);
+        setProfile(m_profile);
+    }
+    m_showResetDialog = false;
 }

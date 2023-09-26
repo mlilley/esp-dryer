@@ -1,88 +1,72 @@
 #include "SettingsPage.h"
 
-void onTempUnitChangeCallback(void* inst) {
-    if (inst != NULL) {
-        ((SettingsPage*)inst)->onTempUnitChange();
-    }
-}
+SettingsPage::SettingsPage(ConfigStore* config) : MenuPage(), m_config(config) {
+    m_header = new MenuHeader("Settings");
 
-void SettingsPage::refresh() {
-    int newTempUnits = m_pConfig->getTempUnits();
-    ((MenuEditableTempUnitsItem*)m_items[0])->setValue(newTempUnits);
-}
+    m_items[0] = new MenuEditableItem("Units", new UnitsDelegate(config, config->getTempUnits()));
+    ((MenuEditableItem*)m_items[0])->onChange(new MenuEditableItemChangeHandler<SettingsPage>(this, &SettingsPage::onUnitsChange));
 
-SettingsPage::SettingsPage(ConfigStore* pConfig)
-        : m_header(), m_list(), m_items{} {
-    m_pConfig = pConfig;
-    
-    m_header.setTitle("Settings");
-
-    m_items[0] = new MenuEditableTempUnitsItem("Units", m_pConfig->getTempUnits());
     m_items[1] = new MenuItem("Factory Reset");
+    m_items[1]->onClick(new MenuItemClickHandler<SettingsPage>(this, &SettingsPage::onResetClick));
 
-    ((MenuEditableTempUnitsItem*)m_items[0])->setChangeHandler(&onTempUnitChangeCallback, this);
+    m_list = new MenuList();
+    m_list->setLayout(0, 14, SCREEN_W, 5);
+    m_list->setScrollbar(true);
+    m_list->addItem(m_items[0]);
+    m_list->addItem(m_items[1]);
 
-    m_list.setLayout(0, 14, SCREEN_W, 5);
-    m_list.setScrollbarEnabled(true);
-    m_list.setItems(m_items, 2);
+    m_resetDialog = new MenuDialog(MenuDialog::KIND_OKCANCEL);
+    m_resetDialog->setMsg("Reset to factory", "defaults?");
+    m_resetDialog->onClose(new MenuDialogCloseHandler<SettingsPage>(this, &SettingsPage::onResetClose));
 
-    m_resetDialog.setKind(MenuDialog::KIND_OKCANCEL);
-    m_resetDialog.setMsg("Reset all settings", "to factory?");
-    
-    m_showResetDialog = false;
+    m_showResetDialog = false;   
 }
 
 void SettingsPage::activate(bool reset) {
     MenuPage::activate(reset);
     m_showResetDialog = false;
     if (reset) {
-        m_list.setSelected(0);
+        m_list->setSelected(0);
     }
 }
 
-void SettingsPage::render(Adafruit_SSD1306* display) {
+void SettingsPage::render(display_t* display) {
     MenuPage::render(display);
-    m_header.render(display);
-    m_list.render(display);
+    m_header->render(display);
+    m_list->render(display);
     if (m_showResetDialog) {
-        m_resetDialog.render(display);
+        m_resetDialog->render(display);
     }
 }
 
-bool SettingsPage::handleInput(input_t input) {
+bool SettingsPage::handleInput(input_t* input) {
     if (m_showResetDialog) {
-        m_resetDialog.handleInput(input);
-        if (m_resetDialog.getState() == MenuDialog::STATE_OK) {
-            // reset oked
-            m_pConfig->reset();
-            refresh();
-            m_showResetDialog = false;
-        } else if (m_resetDialog.getState() == MenuDialog::STATE_CANCEL) {
-            m_showResetDialog = false;
-        }
+        return m_resetDialog->handleInput(input);
+    }
+    if (m_list->handleInput(input)) {
         return true;
     }
-    if (m_list.handleInput(input)) {
-        return true;
-    }
-    switch (input.button) {
-        case BUTTON_OK:
-            switch (m_list.getSelected()) {
-                case 1: // reset
-                    m_resetDialog.activate(1);
-                    m_showResetDialog = true;
-                    return true;
-            }
-            return false;
-        case BUTTON_BACK:
-            m_cancelled = true;
-            return false;
-    }
-    return false;
+    return MenuPage::handleInput(input);
 }
 
-void SettingsPage::onTempUnitChange() {
-    int newTempUnits = ((MenuEditableTempUnitsItem*)m_items[0])->getValue();
-    m_pConfig->setTempUnits(newTempUnits);
-    m_pConfig->persistTempUnits();
+void SettingsPage::refresh() {
+    ((UnitsDelegate*)((MenuEditableItem*)m_items[0])->getDelegate())->setValue(m_config->getTempUnits());
+}
+
+void SettingsPage::onResetClick(void) {
+    m_resetDialog->activate(1);
+    m_showResetDialog = true;
+}
+
+void SettingsPage::onResetClose(int result) {
+    if (result == MenuDialog::RESULT_OK) {
+        m_config->reset();
+        refresh();
+    }    
+    m_showResetDialog = false;
+}
+
+void SettingsPage::onUnitsChange(void) {
+    m_config->setTempUnits(((UnitsDelegate*)((MenuEditableItem*)m_items[0])->getDelegate())->getValue());
+    m_config->persistTempUnits();
 }

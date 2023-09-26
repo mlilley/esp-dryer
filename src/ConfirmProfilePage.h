@@ -1,35 +1,46 @@
 #ifndef __CONFIRM_PROFILE_PAGE_H__
 #define __CONFIRM_PROFILE_PAGE_H__
 
+#include <Arduino.h>
 #include "common.h"
+#include "display.h"
+#include "profile.h"
 #include "ConfigStore.h"
 #include "MenuPage.h"
 #include "MenuHeader.h"
 #include "MenuList.h"
+#include "MenuItem.h"
+#include "MenuEditableItem.h"
+#include "TempDelegate.h"
+#include "HoursDelegate.h"
 #include "MenuDialog.h"
-#include <Adafruit_SSD1306.h>
 
 class ConfirmProfilePage : public MenuPage {
     protected:
-        ConfigStore* m_pConfig;
-        MenuHeader m_header;
+        ConfigStore* m_config;
+        MenuHeader* m_header;
         MenuItem* m_items[5];
-        MenuList m_list;
-        MenuDialog m_saveDialog;
-        MenuDialog m_resetDialog;
+        MenuList* m_list;
+        MenuDialog* m_saveDialog;
+        MenuDialog* m_resetDialog;
         int m_profile;
         bool m_showSaveDialog;
         bool m_showResetDialog;
 
-    protected:
-        void refresh();
+        void onStartClick(void);
+        void onSaveClick(void);
+        void onResetClick(void);
+        void onSaveDialogClose(int result);
+        void onResetDialogClose(int result);
 
     public:
         ConfirmProfilePage(ConfigStore* config);
-        void setProfile(int index);
+
         void activate(bool reset);
-        virtual void render(Adafruit_SSD1306* display);
-        virtual bool handleInput(input_t input);
+        void setProfile(int index);
+        profile_t getConfirmedProfile(void);
+        virtual void render(display_t* display);
+        virtual bool handleInput(input_t* input);
 };
 
 #endif

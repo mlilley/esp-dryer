@@ -1,35 +1,24 @@
-#include "InputHandler.h"
+#include "InputTask.h"
 
 #define NUM_BUTTONS 4
 #define BTN_NUM_REQUIRED_CONSISTENT_READINGS 5
-#define BTN_QUIESCENCE 10
+#define BTN_QUIESCENCE 15
 #define BTN_REPEAT 500
-
-typedef struct button_t {
-    int gpioPin;
-    bool state;
-    volatile bool activity;
-    bool changing;
-    int numConsistentReadings;
-    bool lastReading;
-    unsigned long lastRead;
-} button_t;
 
 void IRAM_ATTR isrButton1();
 void IRAM_ATTR isrButton2();
 void IRAM_ATTR isrButton3();
 void IRAM_ATTR isrButton4();
 
-static button_t buttons[NUM_BUTTONS];
-static xQueueHandle queueInput;
+static volatile button_t buttons[NUM_BUTTONS];
 
-void setupInputHandler(int gpio1, int gpio2, int gpio3, int gpio4, xQueueHandle inputQueueHandle) {
+void InputTask::init(xQueueHandle inputQueue, int gpio1, int gpio2, int gpio3, int gpio4) {
     buttons[0].gpioPin = gpio1;
     buttons[1].gpioPin = gpio2;
     buttons[2].gpioPin = gpio3;
     buttons[3].gpioPin = gpio4;
 
-    queueInput = inputQueueHandle;
+    m_inputQueue = inputQueue;
 
     pinMode(buttons[0].gpioPin, INPUT_PULLUP);
     pinMode(buttons[1].gpioPin, INPUT_PULLUP);
@@ -49,7 +38,7 @@ void setupInputHandler(int gpio1, int gpio2, int gpio3, int gpio4, xQueueHandle 
  * Holding a button down results in repeat button presses, and applying the 
  * long-press modifer;
  */
-void taskInputHandler(void *param) {
+void InputTask::run(void) {
     const TickType_t delay = 2/portTICK_PERIOD_MS;
     bool reading;
     input_t input;
@@ -72,7 +61,7 @@ void taskInputHandler(void *param) {
                         buttons[x].lastRead = ms;
                         input.button = x;
                         input.longpress = true;
-                        xQueueSend(queueInput, &input, 500);
+                        xQueueSend(m_inputQueue, &input, 500);
                     }
                 }
             } else {
@@ -93,7 +82,7 @@ void taskInputHandler(void *param) {
                             if (buttons[x].state) {
                                 input.button = x;
                                 input.longpress = false;
-                                xQueueSend(queueInput, &input, 500);
+                                xQueueSend(m_inputQueue, &input, 500);
                             }              
                         }
                     } else {
