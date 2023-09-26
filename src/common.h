@@ -18,8 +18,8 @@
 
 #define TEMP_MIN 0
 #define TEMP_MAX 80
-#define HOURS_MIN 0 // Fixed point; x10
-#define HOURS_MAX 240 // Fixed point; x10
+#define HOURS_MIN 1800 // seconds
+#define HOURS_MAX 86400 // seconds
 
 #define BUTTON_UP 0
 #define BUTTON_DOWN 1
@@ -33,11 +33,5 @@ typedef struct input_t {
     int button;
     bool longpress;
 } input_t;
-
-typedef char* (*intTransformer_t)(int, int);
-
-typedef int (*intMutator_t)(int value, bool up, bool longpress);
-
-typedef void (*onChange_t)(void* inst);
 
 #endif

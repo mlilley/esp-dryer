@@ -69,9 +69,3 @@ text scrolling features. Place in dir under /lib.
                                                          +---|    |---+ 
                                                              +----+
 ```
-
-# TODO
-
-User Profile resetting - should it be allowed?
-  - if yes, reset to what?
-  - if no, need way to remove reset entry from confirm page

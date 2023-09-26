@@ -9,18 +9,20 @@
 #define CONFIG_PROFILES_MAX 30
 
 static const int DEF_TEMP_UNITS = 0;
+
 static const profile_t DEF_PROFILES[] = {
-    { "PLA",           45,  60, 0 },
-    { "PETG",          60,  60, 0 },
-    { "ABS",           70,  60, 0 },
-    { "ASA",           80,  60, 0 },
-    { "TPU",           45,  40, 0 },
-    { "Nylon",         80,  60, 0 },
-    { "PolyCarbonate", 80, 100, 0 },
-    { "User 1",        45,  60, PROFILE_STATE_USER_MASK },
-    { "User 2",        45,  60, PROFILE_STATE_USER_MASK },
-    { "User 3",        45,  60, PROFILE_STATE_USER_MASK },
+    { "PLA",           45,  21600, 0 },
+    { "PETG",          60,  21600, 0 },
+    { "ABS",           70,  21600, 0 },
+    { "ASA",           80,  21600, 0 },
+    { "TPU",           45,  14400, 0 },
+    { "Nylon",         80,  21600, 0 },
+    { "PolyCarbonate", 80, 360000, 0 },
+    { "User 1",        45,  21600, PROFILE_STATE_USER_MASK },
+    { "User 2",        45,  21600, PROFILE_STATE_USER_MASK },
+    { "User 3",        45,  21600, PROFILE_STATE_USER_MASK }
 };
+
 static const profile_t DEF_ZERO_PROFILE = { "", TEMP_MIN, HOURS_MIN, 0 };
 
 class ConfigStore {

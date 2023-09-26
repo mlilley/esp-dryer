@@ -22,13 +22,13 @@ int HoursDelegate::getValue(void) {
 bool HoursDelegate::handleInput(input_t* input) {
     switch (input->button) {
         case BUTTON_UP:
-            m_value += (input->longpress ? 5 : 1);
+            m_value += (input->longpress ? 1800 : 60);
             if (m_value > HOURS_MAX) {
                 m_value = HOURS_MAX;
             }
             return true;
         case BUTTON_DOWN:
-            m_value -= (input->longpress ? 5 : 1);
+            m_value -= (input->longpress ? 1800 : 60);
             if (m_value < HOURS_MIN) {
                 m_value = HOURS_MIN;
             }
@@ -51,8 +51,8 @@ void HoursDelegate::render(display_t* display, int x, int y, int w, int h, bool 
     int xField = x + w - charsWide*6 - 3;
     int wField = charsWide*6 - 1;
 
-    int hours = m_value / 10;
-    int mins = m_value - (hours * 10);
+    int hours = m_value / 3600;
+    int mins = m_value % 3600 / 60;
 
     display->setCursor(xField, y);
     display->printf("%02d:%02d", hours, mins);

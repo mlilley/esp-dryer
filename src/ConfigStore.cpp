@@ -21,7 +21,7 @@ ConfigStore::ConfigStore() {
 void ConfigStore::load() {
     Preferences prefs;
     prefs.begin(NAMESPACE_NAME, false);
-    _initializeRom(&prefs, false);
+    _initializeRom(&prefs, true);
     _readRom(&prefs);
     prefs.end();
     m_loaded = true;
