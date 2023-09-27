@@ -1,9 +1,10 @@
-#ifndef __SELECT_PROFILE_PAGE_H__
-#define __SELECT_PROFILE_PAGE_H__
+#ifndef __ESP_DRYER__SELECT_PROFILE_PAGE_H__
+#define __ESP_DRYER__SELECT_PROFILE_PAGE_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "ConfigStore.h"
 #include "MenuPage.h"
 #include "MenuHeader.h"
@@ -22,7 +23,7 @@ class ChooseProfilePage : public MenuPage {
         int getSelected();
         void activate(bool reset);
         virtual void render(display_t* display);
-        virtual bool handleInput(input_t* input);
+        virtual bool handleMsg(msg_t* msg);
 
     protected: 
         void reloadProfiles(void);

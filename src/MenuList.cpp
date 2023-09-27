@@ -83,24 +83,26 @@ void MenuList::render(display_t* display) {
     }
 }
 
-bool MenuList::handleInput(input_t* input) {
+bool MenuList::handleMsg(msg_t* msg) {
     if (m_selected != -1) {
-        if (m_items[m_selected]->handleInput(input)) {
+        if (m_items[m_selected]->handleMsg(msg)) {
             return true;
         }
     }
-    switch (input->button) {
-        case BUTTON_UP:
-            selectPrev();
-            return true;
-        case BUTTON_DOWN:
-            selectNext();
-            return true;
-        case BUTTON_OK:
-            if (m_onClick != nullptr) {
-                (*m_onClick)(m_selected);
+    if (IS_INPUT(msg)) {
+        switch (msg->button) {
+            case BUTTON_UP:
+                selectPrev();
                 return true;
-            }
+            case BUTTON_DOWN:
+                selectNext();
+                return true;
+            case BUTTON_OK:
+                if (m_onClick != nullptr) {
+                    (*m_onClick)(m_selected);
+                    return true;
+                }
+        }
     }
     return false;
 }

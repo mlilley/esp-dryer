@@ -12,13 +12,13 @@ void IRAM_ATTR isrButton4();
 
 static volatile button_t buttons[NUM_BUTTONS];
 
-void InputTask::init(xQueueHandle inputQueue, int gpio1, int gpio2, int gpio3, int gpio4) {
+void InputTask::init(xQueueHandle msgQueue, int gpio1, int gpio2, int gpio3, int gpio4) {
     buttons[0].gpioPin = gpio1;
     buttons[1].gpioPin = gpio2;
     buttons[2].gpioPin = gpio3;
     buttons[3].gpioPin = gpio4;
 
-    m_inputQueue = inputQueue;
+    m_msgQueue = msgQueue;
 
     pinMode(buttons[0].gpioPin, INPUT_PULLUP);
     pinMode(buttons[1].gpioPin, INPUT_PULLUP);
@@ -41,7 +41,10 @@ void InputTask::init(xQueueHandle inputQueue, int gpio1, int gpio2, int gpio3, i
 void InputTask::run(void) {
     const TickType_t delay = 2/portTICK_PERIOD_MS;
     bool reading;
-    input_t input;
+    
+    msg_t msg;
+    msg.kind = MSG_KIND_INPUT;
+
     for (;;) {
         for (int x = 0; x < NUM_BUTTONS; x++) {
             if (!buttons[x].changing) {
@@ -59,9 +62,9 @@ void InputTask::run(void) {
                     if (ms - buttons[x].lastRead > BTN_REPEAT) {
                         // Button has remained pushed for the repeat period; enqueue another pushed msg.
                         buttons[x].lastRead = ms;
-                        input.button = x;
-                        input.longpress = true;
-                        xQueueSend(m_inputQueue, &input, 500);
+                        msg.button = x+1;
+                        msg.longpress = true;
+                        xQueueSend(m_msgQueue, &msg, 500);
                     }
                 }
             } else {
@@ -80,9 +83,9 @@ void InputTask::run(void) {
                             buttons[x].numConsistentReadings = 0;
                             // If button changed to pushed, enqueue a pushed msg.
                             if (buttons[x].state) {
-                                input.button = x;
-                                input.longpress = false;
-                                xQueueSend(m_inputQueue, &input, 500);
+                                msg.button = x+1;
+                                msg.longpress = false;
+                                xQueueSend(m_msgQueue, &msg, 500);
                             }              
                         }
                     } else {

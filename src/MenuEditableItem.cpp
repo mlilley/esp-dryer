@@ -35,13 +35,15 @@ void MenuEditableItem::render(display_t* display, int x, int y, int w, int h) {
     m_delegate->render(display, x, y, w, h, m_editing);
 }
 
-bool MenuEditableItem::handleInput(input_t* input) {
+bool MenuEditableItem::handleMsg(msg_t* msg) {
     if (m_editing) {
-        return m_delegate->handleInput(input);
+        return m_delegate->handleMsg(msg);
     }
-    if (input->button == BUTTON_OK) {
-        m_editing = true;
-        return true;
+    if (IS_INPUT(msg)) {
+        if (msg->button == BUTTON_OK) {
+            m_editing = true;
+            return true;
+        }
     }
     return false;
 }

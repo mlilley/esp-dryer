@@ -1,8 +1,9 @@
-#ifndef __INPUT_HANDLER_H__
-#define __INPUT_HANDLER_H__
+#ifndef __ESP_DRYER__INPUT_TASK_H__
+#define __ESP_DRYER__INPUT_TASK_H__
 
 #include <Arduino.h>
 #include "common.h"
+#include "message.h"
 
 typedef struct button_t {
     int gpioPin;
@@ -16,10 +17,10 @@ typedef struct button_t {
 
 class InputTask {
     protected:
-        xQueueHandle m_inputQueue;
+        xQueueHandle m_msgQueue;
 
     public:
-        void init(xQueueHandle inputQueue, int gpio1, int gpio2, int gpio3, int gpio4);
+        void init(xQueueHandle msgQueue, int gpio1, int gpio2, int gpio3, int gpio4);
         void run(void);
 
     public:

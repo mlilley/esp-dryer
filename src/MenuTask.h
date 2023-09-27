@@ -1,9 +1,10 @@
-#ifndef __MENU_HANDLER_H__
-#define __MENU_HANDLER_H__
+#ifndef __ESP_DRYER__MENU_TASK_H__
+#define __ESP_DRYER__MENU_TASK_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "ConfigStore.h"
 #include "HomePage.h"
 #include "ChooseProfilePage.h"
@@ -21,7 +22,7 @@ class MenuTask {
         MenuPage* m_currentPage;
 
         display_t* m_display;
-        xQueueHandle m_inputQueue;
+        xQueueHandle m_msgQueue;
 
     protected:
         void onHomePageComplete(int result);
@@ -31,7 +32,7 @@ class MenuTask {
         void render();
 
     public:
-        void init(ConfigStore* config, display_t* display, xQueueHandle inputQueue);
+        void init(ConfigStore* config, display_t* display, xQueueHandle msgQueue);
         void run(void);
 
     public:

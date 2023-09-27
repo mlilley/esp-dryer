@@ -19,20 +19,22 @@ int UnitsDelegate::getValue(void) {
     return m_value;
 }
 
-bool UnitsDelegate::handleInput(input_t* input) {
-    switch (input->button) {
-        case BUTTON_UP:
-        case BUTTON_DOWN:
-            m_value = (m_value == UNITS_C ? UNITS_F : UNITS_C);
-            return true;
-        case BUTTON_OK:
-            m_originalValue = m_value;
-            commitValue();
-            return true;
-        case BUTTON_BACK:
-            m_value = m_originalValue;
-            rejectValue();
-            return true;
+bool UnitsDelegate::handleMsg(msg_t* msg) {
+    if (IS_INPUT(msg)) {
+        switch (msg->button) {
+            case BUTTON_UP:
+            case BUTTON_DOWN:
+                m_value = (m_value == UNITS_C ? UNITS_F : UNITS_C);
+                return true;
+            case BUTTON_OK:
+                m_originalValue = m_value;
+                commitValue();
+                return true;
+            case BUTTON_BACK:
+                m_value = m_originalValue;
+                rejectValue();
+                return true;
+        }
     }
     return false;
 }

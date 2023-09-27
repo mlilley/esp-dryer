@@ -31,13 +31,15 @@ void MenuItem::render(display_t* display, int x, int y, int w, int h) {
     display->printf("%s",(m_title == NULL ? "" : m_title));
 }
 
-bool MenuItem::handleInput(input_t* input) {
-    switch (input->button) {
-        case BUTTON_OK:
-            if (m_onClick != nullptr) {
-                (*m_onClick)();
-                return true;
-            }
+bool MenuItem::handleMsg(msg_t* msg) {
+    if (IS_INPUT(msg)) {
+        switch (msg->button) {
+            case BUTTON_OK:
+                if (m_onClick != nullptr) {
+                    (*m_onClick)();
+                    return true;
+                }
+        }
     }
     return false;
 }

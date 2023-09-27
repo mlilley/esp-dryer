@@ -1,5 +1,5 @@
-#ifndef __MENU_HEADER_H__
-#define __MENU_HEADER_H__
+#ifndef __ESP_DRYER__MENU_HEADER_H__
+#define __ESP_DRYER__MENU_HEADER_H__
 
 #include <Arduino.h>
 #include "common.h"

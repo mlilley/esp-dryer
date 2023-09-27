@@ -1,5 +1,5 @@
-#ifndef __PROFILE_H__
-#define __PROFILE_H__
+#ifndef __ESP_DRYER__PROFILE_H__
+#define __ESP_DRYER__PROFILE_H__
 
 #define PROFILE_NAME_MAX 14
 

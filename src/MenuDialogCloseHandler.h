@@ -1,5 +1,5 @@
-#ifndef __MENU_DIALOG_CLOSE_HANDLER_H__
-#define __MENU_DIALOG_CLOSE_HANDLER_H__
+#ifndef __ESP_DRYER__MENU_DIALOG_CLOSE_HANDLER_H__
+#define __ESP_DRYER__MENU_DIALOG_CLOSE_HANDLER_H__
 
 class IMenuDialogCloseHandler {
     public:

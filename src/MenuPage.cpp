@@ -18,17 +18,19 @@ void MenuPage::render(display_t* display) {
     display->clearDisplay();
 }
 
-bool MenuPage::handleInput(input_t* input) {
-    if (input->button == BUTTON_OK) {
-        if (m_onComplete != nullptr) {
-            (*m_onComplete)(MENU_PAGE_RESULT_OK);
-            return true;
+bool MenuPage::handleMsg(msg_t* msg) {
+    if (IS_INPUT(msg)) {
+        if (msg->button == BUTTON_OK) {
+            if (m_onComplete != nullptr) {
+                (*m_onComplete)(MENU_PAGE_RESULT_OK);
+                return true;
+            }
         }
-    }
-    if (input->button == BUTTON_BACK) {
-        if (m_onComplete != nullptr) {
-            (*m_onComplete)(MENU_PAGE_RESULT_BACK);
-            return true;
+        if (msg->button == BUTTON_BACK) {
+            if (m_onComplete != nullptr) {
+                (*m_onComplete)(MENU_PAGE_RESULT_BACK);
+                return true;
+            }
         }
     }
     return false;

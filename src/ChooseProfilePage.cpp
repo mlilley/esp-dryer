@@ -32,11 +32,11 @@ void ChooseProfilePage::render(display_t* display) {
     m_list->render(display);
 }
 
-bool ChooseProfilePage::handleInput(input_t* input) {
-    if (m_list->handleInput(input)) {
+bool ChooseProfilePage::handleMsg(msg_t* msg) {
+    if (m_list->handleMsg(msg)) {
         return true;
     }
-    return MenuPage::handleInput(input);
+    return MenuPage::handleMsg(msg);
 }
 
 void ChooseProfilePage::reloadProfiles(void) {

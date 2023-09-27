@@ -72,16 +72,16 @@ void ConfirmProfilePage::render(display_t* display) {
     }
 }
 
-bool ConfirmProfilePage::handleInput(input_t* input) {
+bool ConfirmProfilePage::handleMsg(msg_t* msg) {
     if (m_showSaveDialog) {
-        return m_saveDialog->handleInput(input);
+        return m_saveDialog->handleMsg(msg);
     } else if (m_showResetDialog) {
-        return m_resetDialog->handleInput(input);
+        return m_resetDialog->handleMsg(msg);
     }
-    if (m_list->handleInput(input)) {
+    if (m_list->handleMsg(msg)) {
         return true;
     }
-    return MenuPage::handleInput(input);
+    return MenuPage::handleMsg(msg);
 }
 
 void ConfirmProfilePage::onStartClick(void) {

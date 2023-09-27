@@ -1,5 +1,5 @@
-#ifndef __MENU_ITEM_CLICK_HANDLER_H__
-#define __MENU_ITEM_CLICK_HANDLER_H__
+#ifndef __ESP_DRYER__MENU_ITEM_CLICK_HANDLER_H__
+#define __ESP_DRYER__MENU_ITEM_CLICK_HANDLER_H__
 
 class IMenuItemClickHandler {
     public:

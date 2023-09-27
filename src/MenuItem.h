@@ -1,9 +1,10 @@
-#ifndef __MENU_ITEM_H__
-#define __MENU_ITEM_H__
+#ifndef __ESP_DRYER__MENU_ITEM_H__
+#define __ESP_DRYER__MENU_ITEM_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "MenuItemClickHandler.h"
 
 class MenuItem {
@@ -20,7 +21,7 @@ class MenuItem {
         void onClick(IMenuItemClickHandler* onClick);
 
         virtual void render(display_t* display, int x, int y, int w, int h);
-        virtual bool handleInput(input_t* input);
+        virtual bool handleMsg(msg_t* msg);
 };
 
 #endif

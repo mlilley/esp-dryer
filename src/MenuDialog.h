@@ -1,9 +1,10 @@
-#ifndef __MENU_DIALOG_H__
-#define __MENU_DIALOG_H__
+#ifndef __ESP_DRYER__MENU_DIALOG_H__
+#define __ESP_DRYER__MENU_DIALOG_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "MenuDialogCloseHandler.h"
 
 class MenuDialog {
@@ -33,7 +34,7 @@ class MenuDialog {
         void onClose(IMenuDialogCloseHandler* onClose);
       
         void render(display_t* display);
-        bool handleInput(input_t* input);
+        bool handleMsg(msg_t* msg);
 };
 
 #endif

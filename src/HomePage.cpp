@@ -9,6 +9,8 @@ HomePage::HomePage(ConfigStore* config) : MenuPage(), m_config(config) {
     m_list->setScrollbar(false);
     m_list->addItem(m_items[0]);
     m_list->addItem(m_items[1]);
+
+    m_temp = 0;
 }
 
 void HomePage::activate(bool reset) {
@@ -23,6 +25,8 @@ int HomePage::getSelected() {
 }
 
 void HomePage::render(display_t* display) {
+    static const int tempCharsWide = 5;
+    
     MenuPage::render(display);
 
     display->setTextColor(WHITE);
@@ -34,16 +38,26 @@ void HomePage::render(display_t* display) {
     display->setTextSize(1);
     display->setCursor(2, 56);
     display->printf("v%s", VERSION);
+    
+
     display->setCursor(102, 56);
-    display->printf("%*d\xF8""C", 2, 45);
+    if (m_config->getTempUnits() == UNITS_C) {
+        display->printf("%.1f\xF8""C", m_temp);
+    } else {
+        display->printf("%.1f\xF8""F", m_temp * 9.0 / 5.0 + 32);
+    }  
     display->fillRect(0, 55, SCREEN_W, 10, INVERSE);
 
     m_list->render(display);
 }
 
-bool HomePage::handleInput(input_t* input) {
-    if (m_list->handleInput(input)) {
+bool HomePage::handleMsg(msg_t* msg) {
+    if (m_list->handleMsg(msg)) {
         return true;
     }
-    return MenuPage::handleInput(input);
+    if (IS_SENSOR(msg)) {
+        m_temp = msg->temp;
+        return true;
+    }
+    return MenuPage::handleMsg(msg);
 }

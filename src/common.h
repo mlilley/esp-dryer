@@ -1,5 +1,5 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#ifndef __ESP_DRYER__COMMON_H__
+#define __ESP_DRYER__COMMON_H__
 
 #define VERSION "1.0"
 
@@ -11,6 +11,8 @@
 #define GPIO_BUTTONOK 23
 #define GPIO_BUTTONBACK 32
 
+#define GPIO_TEMP 33
+
 #define SCREEN_W 128
 #define SCREEN_H 64
 
@@ -21,17 +23,7 @@
 #define HOURS_MIN 1800 // seconds
 #define HOURS_MAX 86400 // seconds
 
-#define BUTTON_UP 0
-#define BUTTON_DOWN 1
-#define BUTTON_OK 2
-#define BUTTON_BACK 3
-
 #define UNITS_C 0
 #define UNITS_F 1
-
-typedef struct input_t {
-    int button;
-    bool longpress;
-} input_t;
 
 #endif

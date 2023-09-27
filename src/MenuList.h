@@ -1,9 +1,10 @@
-#ifndef __MENU_LIST_H__
-#define __MENU_LIST_H__
+#ifndef __ESP_DRYER__MENU_LIST_H__
+#define __ESP_DRYER__MENU_LIST_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "ConfigStore.h"
 #include "MenuItem.h"
 #include "MenuListItemSelectHandler.h"
@@ -45,7 +46,7 @@ class MenuList {
         void onItemClick(IMenuListItemClickHandler* onClick);
 
         virtual void render(display_t* display);
-        virtual bool handleInput(input_t* input);
+        virtual bool handleMsg(msg_t* msg);
 };
 
 #endif

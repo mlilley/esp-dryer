@@ -54,22 +54,24 @@ void MenuDialog::render(display_t* display) {
     }
 }
 
-bool MenuDialog::handleInput(input_t* input) {
-    switch (input->button) {
-        case BUTTON_UP:
-        case BUTTON_DOWN:
-            m_selected = (m_kind == KIND_OK ? 0 : m_selected == 0 ? 1 : 0);
-            return true;
-        case BUTTON_OK:
-            if (m_onClose != nullptr) {
-                (*m_onClose)(m_kind == KIND_OKCANCEL && m_selected == 1 ? RESULT_CANCEL : RESULT_OK);
-            }
-            return true;
-        case BUTTON_BACK:
-            if (m_onClose != nullptr) {
-                (*m_onClose)(RESULT_CANCEL);
-            }
-            return true;
+bool MenuDialog::handleMsg(msg_t* msg) {
+    if (IS_INPUT(msg)) {
+        switch (msg->button) {
+            case BUTTON_UP:
+            case BUTTON_DOWN:
+                m_selected = (m_kind == KIND_OK ? 0 : m_selected == 0 ? 1 : 0);
+                return true;
+            case BUTTON_OK:
+                if (m_onClose != nullptr) {
+                    (*m_onClose)(m_kind == KIND_OKCANCEL && m_selected == 1 ? RESULT_CANCEL : RESULT_OK);
+                }
+                return true;
+            case BUTTON_BACK:
+                if (m_onClose != nullptr) {
+                    (*m_onClose)(RESULT_CANCEL);
+                }
+                return true;
+        }
     }
     return false;
 }

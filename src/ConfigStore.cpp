@@ -21,7 +21,7 @@ ConfigStore::ConfigStore() {
 void ConfigStore::load() {
     Preferences prefs;
     prefs.begin(NAMESPACE_NAME, false);
-    _initializeRom(&prefs, true);
+    _initializeRom(&prefs, false);
     _readRom(&prefs);
     prefs.end();
     m_loaded = true;
@@ -204,14 +204,17 @@ void ConfigStore::_safeReadProfile(Preferences* prefs, int index) {
 
     int n = strnlen(m_profiles[index].name, PROFILE_NAME_MAX + 1);
     if (n == PROFILE_NAME_MAX + 1) {
+        Serial.print("A\n");
         _errorProfile(index);
         return;
     }
     if (m_profiles[index].temp < TEMP_MIN || m_profiles[index].temp > TEMP_MAX) {
+        Serial.print("B\n");
         _errorProfile(index);
         return;
     }
     if (m_profiles[index].hours < HOURS_MIN || m_profiles[index].hours > HOURS_MAX) {
+        Serial.printf("C %d\n", m_profiles[index].hours);
         _errorProfile(index);
         return;
     }

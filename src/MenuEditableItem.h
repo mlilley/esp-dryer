@@ -1,9 +1,10 @@
-#ifndef __MENU_EDITABLE_ITEM_H__
-#define __MENU_EDITABLE_ITEM_H__
+#ifndef __ESP_DRYER__MENU_EDITABLE_ITEM_H__
+#define __ESP_DRYER__MENU_EDITABLE_ITEM_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "MenuItem.h"
 #include "MenuEditableItemDelegate.h"
 #include "MenuEditableItemChangeHandler.h"
@@ -28,7 +29,7 @@ class MenuEditableItem : public MenuItem {
         MenuEditableItemDelegate* getDelegate();
 
         virtual void render(display_t* display, int x, int y, int w, int h);
-        virtual bool handleInput(input_t* input);
+        virtual bool handleMsg(msg_t* msg);
 };
 
 #endif

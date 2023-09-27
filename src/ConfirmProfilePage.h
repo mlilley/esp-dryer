@@ -1,9 +1,10 @@
-#ifndef __CONFIRM_PROFILE_PAGE_H__
-#define __CONFIRM_PROFILE_PAGE_H__
+#ifndef __ESP_DRYER__CONFIRM_PROFILE_PAGE_H__
+#define __ESP_DRYER__CONFIRM_PROFILE_PAGE_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h"
+#include "message.h"
 #include "profile.h"
 #include "ConfigStore.h"
 #include "MenuPage.h"
@@ -40,7 +41,7 @@ class ConfirmProfilePage : public MenuPage {
         void setProfile(int index);
         profile_t getConfirmedProfile(void);
         virtual void render(display_t* display);
-        virtual bool handleInput(input_t* input);
+        virtual bool handleMsg(msg_t* msg);
 };
 
 #endif

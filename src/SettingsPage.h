@@ -1,9 +1,10 @@
-#ifndef __SETTINGS_PAGE_H__
-#define __SETTINGS_PAGE_H__
+#ifndef __ESP_DRYER__SETTINGS_PAGE_H__
+#define __ESP_DRYER__SETTINGS_PAGE_H__
 
 #include <Arduino.h>
 #include "common.h"
 #include "display.h" 
+#include "message.h"
 #include "ConfigStore.h"
 #include "MenuPage.h"
 #include "MenuHeader.h"
@@ -33,7 +34,7 @@ class SettingsPage : public MenuPage {
         SettingsPage(ConfigStore* config);
         void activate(bool reset);
         void render(display_t* display);
-        bool handleInput(input_t* input);
+        bool handleMsg(msg_t* msg);
 };
 
 #endif

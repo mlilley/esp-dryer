@@ -19,28 +19,30 @@ int TempDelegate::getValue(void) {
     return m_value;
 }
 
-bool TempDelegate::handleInput(input_t* input) {
-    switch (input->button) {
-        case BUTTON_UP:
-            m_value += (input->longpress ? 10 : 5);
-            if (m_value > TEMP_MAX) {
-                m_value = TEMP_MAX;
-            }
-            return true;
-        case BUTTON_DOWN:
-            m_value -= (input->longpress ? 10 : 5);
-            if (m_value < TEMP_MIN) {
-                m_value = TEMP_MIN;
-            }
-            return true;
-        case BUTTON_OK:
-            m_originalValue = m_value;
-            commitValue();
-            return true;
-        case BUTTON_BACK:
-            m_value = m_originalValue;
-            rejectValue();
-            return true;
+bool TempDelegate::handleMsg(msg_t* msg) {
+    if (IS_INPUT(msg)) {
+        switch (msg->button) {
+            case BUTTON_UP:
+                m_value += (msg->longpress ? 10 : 5);
+                if (m_value > TEMP_MAX) {
+                    m_value = TEMP_MAX;
+                }
+                return true;
+            case BUTTON_DOWN:
+                m_value -= (msg->longpress ? 10 : 5);
+                if (m_value < TEMP_MIN) {
+                    m_value = TEMP_MIN;
+                }
+                return true;
+            case BUTTON_OK:
+                m_originalValue = m_value;
+                commitValue();
+                return true;
+            case BUTTON_BACK:
+                m_value = m_originalValue;
+                rejectValue();
+                return true;
+        }
     }
     return false;
 }

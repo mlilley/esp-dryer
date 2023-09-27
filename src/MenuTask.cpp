@@ -1,9 +1,9 @@
 #include "MenuTask.h"
 
-void MenuTask::init(ConfigStore* config, display_t* display, xQueueHandle inputQueue) {
+void MenuTask::init(ConfigStore* config, display_t* display, xQueueHandle msgQueue) {
     m_config = config;
     m_display = display;
-    m_inputQueue = inputQueue;
+    m_msgQueue = msgQueue;
 
     m_homePage = new HomePage(m_config);
     m_homePage->onComplete(new MenuPageCompletionHandler<MenuTask>(this, &MenuTask::onHomePageComplete));
@@ -21,15 +21,15 @@ void MenuTask::init(ConfigStore* config, display_t* display, xQueueHandle inputQ
 }
 
 void MenuTask::run(void) {
-    input_t input;
+    msg_t msg;
 
     m_currentPage->activate(true);
     m_currentPage->render(m_display);
     m_display->display();
 
     for (;;) {
-        if (xQueueReceive(m_inputQueue, &input, 500)) {
-            if (m_currentPage->handleInput(&input)) {
+        if (xQueueReceive(m_msgQueue, &msg, 500)) {
+            if (m_currentPage->handleMsg(&msg)) {
                 m_currentPage->render(m_display);
                 m_display->display();
             }

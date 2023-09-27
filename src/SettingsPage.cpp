@@ -39,14 +39,14 @@ void SettingsPage::render(display_t* display) {
     }
 }
 
-bool SettingsPage::handleInput(input_t* input) {
+bool SettingsPage::handleMsg(msg_t* msg) {
     if (m_showResetDialog) {
-        return m_resetDialog->handleInput(input);
+        return m_resetDialog->handleMsg(msg);
     }
-    if (m_list->handleInput(input)) {
+    if (m_list->handleMsg(msg)) {
         return true;
     }
-    return MenuPage::handleInput(input);
+    return MenuPage::handleMsg(msg);
 }
 
 void SettingsPage::refresh() {
